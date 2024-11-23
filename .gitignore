@@ -1,0 +1,7 @@
+.vs
+
+# Ignore build folders
+backend/bin/
+backend/obj/
+
+/web/node_modules
