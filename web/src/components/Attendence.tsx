@@ -1,10 +1,9 @@
-import './App.css';
+import '../stylesheets/App.css';
 import Table from 'react-bootstrap/Table';
 import Container from 'react-bootstrap/Container';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Button } from '@chakra-ui/react'
 
 function Attendence() {
   const location = useLocation();
@@ -54,7 +53,7 @@ function Attendence() {
               </tr>
           </tbody>
         </Table>
-        <Button size="md" variant="solid" color={'white'} background={'black'} onClick={submitHandler}>SUBMIT</Button>
+        <button onClick={submitHandler}>SUBMIT</button>
       </Container>
     </div>
     </>
