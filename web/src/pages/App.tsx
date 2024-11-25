@@ -1,10 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Form from './Form';
+import List from '../components/List';
 
 function App() {
   return (
     <>
-    <Form></Form>
+    <List></List>
     </>
   )
 }

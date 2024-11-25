@@ -1,4 +1,4 @@
-import './App.css';
+import '../stylesheets/App.css';
 import Table from 'react-bootstrap/Table';
 import Container from 'react-bootstrap/Container';
 import 'bootstrap/dist/css/bootstrap.min.css';

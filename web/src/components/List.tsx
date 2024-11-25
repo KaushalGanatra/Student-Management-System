@@ -1,9 +1,9 @@
-import './App.css';
+import '../stylesheets/App.css';
 import { useEffect, useState } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { Table, Button, Spinner, Card, Modal, InputGroup, FormControl, ListGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { Student } from './Types';
+import { Student } from '../structures/Types';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 function StudentList() {
