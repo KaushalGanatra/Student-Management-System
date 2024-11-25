@@ -1,133 +1,184 @@
 import { useState, useEffect } from 'react';
+import { Formik, Field, Form, ErrorMessage } from 'formik';
+import { Button, Form as BootstrapForm, Row, Col, Alert, Spinner, Container, Card } from 'react-bootstrap';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Form, Button, Spinner, Alert } from 'react-bootstrap';  
-import { Link, useParams } from 'react-router-dom';  
-import { Student } from './Types';
+import { Student, validationSchema } from './Types';  
 
-function BootstrapForm() {
-  const { id } = useParams();
-  const sId = Number(id);
+
+const StudentForm = () => {
+  const { id } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
   const [student, setStudent] = useState<Student>({
-    id: 0, 
-    name: '', 
-    class: '', 
-    division: '', 
-    gender: ''
+    name: '',
+    class: '',
+    division: '',
+    gender: '',
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
 
   useEffect(() => {
-    if (sId) {
-      fetchStudentData(sId);
+    if (id) {
+      fetchStudentData(Number(id));
     }
-  }, [sId]);
+  }, [id]);
 
-  const fetchStudentData = async (sId: number): Promise<void> => {
+  const fetchStudentData = async (studentId: number) => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5027/api/student/${sId}`);
+      const response = await axios.get<Student>(`http://localhost:5027/api/student/${studentId}`);
       setStudent(response.data);
     } catch (err) {
-      setError('Error fetching student data.');
+      setError('Error fetching student data');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setStudent((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
-    e.preventDefault();
+  const handleSubmit = async (values: Student) => {
     setLoading(true);
     try {
       if (id) {
-        await axios.put(`http://localhost:5027/api/student/${id}`, student);
-        setSuccess('Student Updated Successfully!');
+        await axios.put(`http://localhost:5027/api/student/${id}`, values);
+        setSuccess('Student updated successfully!');
       } else {
-        await axios.post('http://localhost:5027/api/student', student);
-        setSuccess('Student Added Successfully!');
+        await axios.post('http://localhost:5027/api/student', values);
+        setSuccess('Student added successfully!');
       }
-      setLoading(false);
-      setStudent({ name: '', class: '', division: '', gender: '' });
+      navigate('/list');
     } catch (err) {
       setError('Error while submitting form!');
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Group className="mb-3" controlId="Name">
-        <Form.Label>Student Name</Form.Label>
-        <Form.Control 
-          type="text" 
-          name="name"
-          placeholder="Enter Name" 
-          value={student.name} 
-          onChange={handleChange}
-        />
-      </Form.Group>
+    <Container>
+      <Card className="p- shadow">
+        <h2 className="text-center mb-4">{id ? 'Edit Student' : 'Add New Student'}</h2>
 
-      <Form.Group className="mb-3" controlId="Class">
-        <Form.Label>Class</Form.Label>
-        <Form.Control 
-          type="number" 
-          name="class"
-          placeholder="Enter Class"
-          value={student.class}
-          onChange={handleChange}
-        />
-      </Form.Group>
+        {loading && !success && <Spinner animation="border" />}
 
-      <Form.Group className="mb-3" controlId="Division">
-        <Form.Label>Division</Form.Label>
-        <Form.Control 
-          as="select" 
-          name="division"
-          value={student.division}
-          onChange={handleChange}
+        {error && <Alert variant="danger">{error}</Alert>}
+        {success && <Alert variant="success">{success}</Alert>}
+
+        <Formik
+          initialValues={student}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+          enableReinitialize={true}
         >
-          <option>Choose...</option>
-          <option>A</option>
-          <option>B</option>
-          <option>C</option>
-        </Form.Control>
-      </Form.Group>
+          {({ touched, errors, isSubmitting }) => (
+            <Form>
+              <Row className="mb-3">
+                <Col>
+                  <BootstrapForm.Group controlId="name">
+                    <BootstrapForm.Label>Full Name</BootstrapForm.Label>
+                    <Field
+                      type="text"
+                      name="name"
+                      id="name"
+                      className={`form-control ${touched.name && errors.name ? 'is-invalid' : ''}`}
+                      placeholder="Full Name"
+                    />
+                    <ErrorMessage name="name" component="div" className="invalid-feedback" />
+                  </BootstrapForm.Group>
+                </Col>
+              </Row>
 
-      <Form.Group className="mb-3" controlId="Gender">
-        <Form.Label>Gender</Form.Label>
-        <Form.Check 
-          type="radio" 
-          name="gender"
-          label="Male"
-          value="Male"
-          checked={student.gender === 'Male'}
-          onChange={handleChange}
-        />
-        <Form.Check 
-          type="radio" 
-          name="gender"
-          label="Female"
-          value="Female"
-          checked={student.gender === 'Female'}
-          onChange={handleChange}
-        />
-      </Form.Group>
+              <Row className="mb-3">
+                <Col>
+                  <BootstrapForm.Group controlId="class">
+                    <BootstrapForm.Label>Class</BootstrapForm.Label>
+                    <Field
+                      type="number"
+                      name="class"
+                      id="class"
+                      className={`form-control ${touched.class && errors.class ? 'is-invalid' : ''}`}
+                      placeholder="Class"
+                    />
+                    <ErrorMessage name="class" component="div" className="invalid-feedback" />
+                  </BootstrapForm.Group>
+                </Col>
+              </Row>
 
-      {error && <Alert variant="danger">{error}</Alert>}
-      {success && <Alert variant="success">{success}</Alert>}
+              <Row className="mb-3">
+                <Col>
+                  <BootstrapForm.Group controlId="division">
+                    <BootstrapForm.Label>Division</BootstrapForm.Label>
+                    <Field
+                      as="select"
+                      name="division"
+                      id="division"
+                      className={`form-control ${touched.division && errors.division ? 'is-invalid' : ''}`}
+                    >
+                      <option value="">Select...</option>
+                      <option value="A">A</option>
+                      <option value="B">B</option>
+                      <option value="C">C</option>
+                    </Field>
+                    <ErrorMessage name="division" component="div" className="invalid-feedback" />
+                  </BootstrapForm.Group>
+                </Col>
+              </Row>
 
-      <Button variant="primary" type="submit" disabled={loading}>
-        {loading ? <Spinner animation="border" size="sm" /> : 'Submit'}
-      </Button>
-      <div><Link to={{ pathname: `/list`}}>Check Student List</Link></div>
-    </Form>
+              <Row className="mb-3">
+                <Col>
+                    <BootstrapForm.Group controlId="gender">
+                    <BootstrapForm.Label>Gender</BootstrapForm.Label>
+                    <div className="form-check">
+                        <Field
+                        type="radio"
+                        name="gender"
+                        value="Male"
+                        id="genderMale"
+                        className={`form-check-input ${touched.gender && errors.gender ? 'is-invalid' : ''}`}
+                        />
+                        <BootstrapForm.Label className="form-check-label" htmlFor="genderMale">
+                        Male
+                        </BootstrapForm.Label>
+                    </div>
+                    <div className="form-check">
+                        <Field
+                        type="radio"
+                        name="gender"
+                        value="Female"
+                        id="genderFemale"
+                        className={`form-check-input ${touched.gender && errors.gender ? 'is-invalid' : ''}`}
+                        />
+                        <BootstrapForm.Label className="form-check-label" htmlFor="genderFemale">
+                        Female
+                        </BootstrapForm.Label>
+                    </div>
+                    <ErrorMessage name="gender" component="div" className="invalid-feedback" />
+                    </BootstrapForm.Group>
+                </Col>
+            </Row>
+
+
+              <Button
+                type="submit"
+                disabled={isSubmitting || loading}
+                variant="primary"
+                className="me-2 w-100"
+              >
+                {loading ? <Spinner animation="border" size="sm" /> : id ? 'Update' : 'Add'}
+              </Button>
+
+              <div className="mt-3">
+                <Button variant="secondary" onClick={() => navigate('/list')} className="w-100">
+                  Cancel
+                </Button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </Card>
+    </Container>
   );
-}
+};
 
-export default BootstrapForm;
+export default StudentForm;
