@@ -1,7 +1,7 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import axios, { AxiosResponse } from 'axios';
-import { Table, Button, Spinner, Card } from 'react-bootstrap';
+import { Table, Button, Spinner, Card, Modal } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Student } from './Types';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -9,6 +9,18 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 function StudentList() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showConformation, setShowConformation] = useState<boolean>(false);
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+
+  const handleClose = () => setShowConformation(false);
+  const handleOpen = (student: Student) => {
+    if (student.id !== undefined) {
+      setStudentToDelete(student);
+      setShowConformation(true);
+    } else {
+      console.error("Student ID is undefined.");
+    }
+  };
 
   useEffect(() => {
     fetchStudents();
@@ -29,7 +41,7 @@ function StudentList() {
   const handleDelete = async (id: number): Promise<void> => {
     try {
       await axios.delete(`http://localhost:5027/api/student/${id}`);
-      fetchStudents();
+      fetchStudents(); 
     } catch (err) {
       console.error('Error deleting student:', err);
     }
@@ -75,7 +87,7 @@ function StudentList() {
                       </Link>
                       <Button
                         variant="outline-danger"
-                        onClick={() => student.id && handleDelete(student.id)}
+                        onClick={() => handleOpen(student)}
                       >
                         <i className="bi bi-trash"></i>
                       </Button>
@@ -87,6 +99,37 @@ function StudentList() {
           )}
         </Card.Body>
       </Card>
+
+      {/* Modal for confirmation */}
+      <Modal show={showConformation} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Are you sure?</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {studentToDelete && (
+            <>
+              Are you sure you want to delete {studentToDelete.name}'s data
+              (Class: {studentToDelete.class} - {studentToDelete.division})?
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            No, don't delete it
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              if (studentToDelete && studentToDelete.id !== undefined) {
+                handleDelete(studentToDelete.id);
+                handleClose(); 
+              }
+            }}
+          >
+            Yes, delete it
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
