@@ -7,7 +7,8 @@ namespace backend.Models
     {
         Male,
         Female,
-        Other
+        Other,
+        Undefined
     }
 
     public class Student

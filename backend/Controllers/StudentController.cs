@@ -39,7 +39,7 @@ namespace backend.Controllers
         {
             if (!Guid.TryParse(id, out var parsedId))
             {
-                return BadRequest("The provided UUID is not valid.");
+                return BadRequest("The provided ID is not valid.");
             }
 
             var student = await _context.Students.Where(s => s.DeletedAt == null && s.Id == parsedId).FirstOrDefaultAsync();
@@ -80,45 +80,46 @@ namespace backend.Controllers
         }
 
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutStudent(int id, [FromBody] Student student)
-        //{
-        //    var existingStudent = await _studentDbContext.Students.FindAsync(id);
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutStudent(string id, [FromBody] StudentDTO studentDto)
+        {
+            if (!Guid.TryParse(id, out var parsedId))
+            {
+                return BadRequest("The provided ID is not valid.");
+            }
 
-        //    if (existingStudent == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var existingStudent = await _context.Students.Where(s => s.DeletedAt == null && s.Id == parsedId).FirstOrDefaultAsync();
 
-        //    // for empty object
-        //    if (string.IsNullOrEmpty(student.Name) &&
-        //        !student.Class.HasValue &&
-        //        string.IsNullOrEmpty(student.Division) &&
-        //        string.IsNullOrEmpty(student.Gender))
-        //    {
-        //        return BadRequest("Student data is required");
-        //    }
+            if (existingStudent == null)
+            {
+                return NotFound("Student with provided ID not found");
+            }
 
-        //    existingStudent.Name = student.Name ?? existingStudent.Name; 
-        //    if(student.Class != 0)
-        //    existingStudent.Name = student.Name ?? existingStudent.Name; 
-        //    {
-        //        existingStudent.Class = student.Class ?? existingStudent.Class;
-        //    }
-        //    existingStudent.Division = student.Division ?? existingStudent.Division; 
-        //    existingStudent.Gender = student.Gender ?? existingStudent.Gender;
+            // for empty object
+            if (string.IsNullOrEmpty(studentDto.Name) &&
+                !studentDto.Class.HasValue &&
+                string.IsNullOrEmpty(studentDto.Division) &&
+                string.IsNullOrEmpty(studentDto.Gender))
+            {
+                return BadRequest("Student data is required");
+            }
 
-        //    await _studentDbContext.SaveChangesAsync();
+            Console.WriteLine("Gender: "+ existingStudent.Gender);
 
-        //    return Ok(existingStudent);
-        //}
+            existingStudent = _mapper.Map(studentDto, existingStudent);
+            existingStudent.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(existingStudent);
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStudent(string id)
         {
             if (!Guid.TryParse(id, out var parsedId))
             {
-                return BadRequest("The provided UUID is not valid.");
+                return BadRequest("The provided ID is not valid.");
             }
 
             var student = await _context.Students.Where(s => s.DeletedAt == null && s.Id == parsedId).FirstOrDefaultAsync();

@@ -1,6 +1,6 @@
 using AutoMapper;
-using backend.Models;
-using backend.DTOs;
+using backend.Models; 
+using backend.DTOs;   
 
 namespace backend.Mappings
 {
@@ -16,23 +16,31 @@ namespace backend.Mappings
 
             // Mapping from StudentDTO to Student (for PUT, PATCH, etc.)
             CreateMap<StudentDTO, Student>()
-                .ForMember(dest => dest.Name, opt => opt.Condition(src => src.Name != null))  // Update only if not null
-                .ForMember(dest => dest.Class, opt => opt.Condition(src => src.Class.HasValue))  // Update only if not null
-                .ForMember(dest => dest.Division, opt => opt.Condition(src => src.Division != null))  // Update only if not null
-                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => ParseGenderFromString(src.Gender)))  // Convert string to Gender enum
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())  // Prevent updating CreatedAt
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));  // Set UpdatedAt to current timestamp
+                .ForMember(dest => dest.Name, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Name)))  // Update only if not null or empty
+                .ForMember(dest => dest.Class, opt => opt.Condition(src => src.Class.HasValue))  
+                .ForMember(dest => dest.Division, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Division))) 
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())  
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow)) 
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom<GenderResolver>()); // Use custom resolver for Gender
+        }
+    }
+
+    public class GenderResolver : IValueResolver<StudentDTO, Student, Gender>
+    {
+        public Gender Resolve(StudentDTO source, Student destination, Gender destMember, ResolutionContext context)
+        {
+            // Check if src.Gender is not null; if so, parse it; otherwise, return the existing value
+            return !string.IsNullOrEmpty(source.Gender) ? ParseGenderFromString(source.Gender) : destMember;
         }
 
-        // Helper method to parse Gender string to Gender enum
-        private Gender? ParseGenderFromString(string gender)
+        private Gender ParseGenderFromString(string gender)
         {
             if (Enum.TryParse<Gender>(gender, true, out var parsedGender))  // Ignore case when parsing
             {
                 return parsedGender;
             }
 
-            return Gender.Male;  // Default to Gender.Male if parsing fails or gender is invalid
+            return Gender.Undefined;  // Default to Gender.Male if parsing fails or gender is invalid
         }
     }
 }
