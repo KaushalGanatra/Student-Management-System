@@ -35,7 +35,7 @@ namespace backend.Controllers
 
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> getStudent(string id)
+        public async Task<IActionResult> GetStudent(string id)
         {
             if (!Guid.TryParse(id, out var parsedId))
             {
@@ -54,7 +54,7 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> postStudent([FromBody] StudentDTO studentDto)
+        public async Task<IActionResult> PostStudent([FromBody] StudentDTO studentDto)
         {
             if (studentDto == null)
             {
@@ -76,12 +76,12 @@ namespace backend.Controllers
 
             var createdStudentDto = _mapper.Map<StudentDTO>(student);
 
-            return CreatedAtAction(nameof(getStudent), new { id = student.Id }, createdStudentDto);
+            return CreatedAtAction(nameof(GetStudent), new { id = student.Id }, createdStudentDto);
         }
 
 
         //[HttpPut("{id}")]
-        //public async Task<IActionResult> putStudent(int id, [FromBody] Student student)
+        //public async Task<IActionResult> PutStudent(int id, [FromBody] Student student)
         //{
         //    var existingStudent = await _studentDbContext.Students.FindAsync(id);
 
@@ -114,7 +114,7 @@ namespace backend.Controllers
         //}
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> deleteStudent(string id)
+        public async Task<IActionResult> DeleteStudent(string id)
         {
             if (!Guid.TryParse(id, out var parsedId))
             {
