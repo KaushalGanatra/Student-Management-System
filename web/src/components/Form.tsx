@@ -60,8 +60,6 @@ const StudentForm = () => {
       <Card className="p-3 shadow-sm">
         <h2 className="text-center mb-4">{id ? 'Edit Student' : 'Add New Student'}</h2>
 
-        {loading && !success && <Spinner animation="border" />}
-
         {error && <Alert variant="danger">{error}</Alert>}
         {success && <Alert variant="success">{success}</Alert>}
 
@@ -127,29 +125,31 @@ const StudentForm = () => {
                 <Col xs={12}>
                   <BootstrapForm.Group controlId="gender">
                     <BootstrapForm.Label className="text-left">Gender</BootstrapForm.Label>
-                    <div className="form-check">
-                      <Field
-                        type="radio"
-                        name="gender"
-                        value="Male"
-                        id="genderMale"
-                        className={`form-check-input ${touched.gender && errors.gender ? 'is-invalid' : ''}`}
-                      />
-                      <BootstrapForm.Label className="form-check-label" htmlFor="genderMale">
-                        Male
-                      </BootstrapForm.Label>
-                    </div>
-                    <div className="form-check">
-                      <Field
-                        type="radio"
-                        name="gender"
-                        value="Female"
-                        id="genderFemale"
-                        className={`form-check-input ${touched.gender && errors.gender ? 'is-invalid' : ''}`}
-                      />
-                      <BootstrapForm.Label className="form-check-label" htmlFor="genderFemale">
-                        Female
-                      </BootstrapForm.Label>
+                    <div className="d-flex">
+                      <div className="form-check me-3">
+                        <Field
+                          type="radio"
+                          name="gender"
+                          value="Male"
+                          id="genderMale"
+                          className={`form-check-input ${touched.gender && errors.gender ? 'is-invalid' : ''}`}
+                        />
+                        <BootstrapForm.Label className="form-check-label" htmlFor="genderMale">
+                          Male
+                        </BootstrapForm.Label>
+                      </div>
+                      <div className="form-check">
+                        <Field
+                          type="radio"
+                          name="gender"
+                          value="Female"
+                          id="genderFemale"
+                          className={`form-check-input ${touched.gender && errors.gender ? 'is-invalid' : ''}`}
+                        />
+                        <BootstrapForm.Label className="form-check-label" htmlFor="genderFemale">
+                          Female
+                        </BootstrapForm.Label>
+                      </div>
                     </div>
                     <ErrorMessage name="gender" component="div" className="invalid-feedback" />
                   </BootstrapForm.Group>
