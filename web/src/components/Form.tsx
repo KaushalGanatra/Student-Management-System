@@ -1,10 +1,10 @@
+import '../stylesheets/App.css';
 import { useState, useEffect } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { Button, Form as BootstrapForm, Row, Col, Alert, Spinner, Container, Card } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Student, validationSchema } from '../structures/Types';  
-
 
 const StudentForm = () => {
   const { id } = useParams<{ id?: string }>();
@@ -47,7 +47,7 @@ const StudentForm = () => {
         await axios.post('http://localhost:5027/api/student', values);
         setSuccess('Student added successfully!');
       }
-      navigate('/list');
+      navigate('/');
     } catch (err) {
       setError('Error while submitting form!');
     } finally {
@@ -56,8 +56,8 @@ const StudentForm = () => {
   };
 
   return (
-    <Container>
-      <Card className="p- shadow">
+    <Container className="mt-3">
+      <Card className="p-3 shadow-sm">
         <h2 className="text-center mb-4">{id ? 'Edit Student' : 'Add New Student'}</h2>
 
         {loading && !success && <Spinner animation="border" />}
@@ -74,9 +74,9 @@ const StudentForm = () => {
           {({ touched, errors, isSubmitting }) => (
             <Form>
               <Row className="mb-3">
-                <Col>
+                <Col xs={12}>
                   <BootstrapForm.Group controlId="name">
-                    <BootstrapForm.Label>Full Name</BootstrapForm.Label>
+                    <BootstrapForm.Label className="text-left">Full Name</BootstrapForm.Label>
                     <Field
                       type="text"
                       name="name"
@@ -90,9 +90,9 @@ const StudentForm = () => {
               </Row>
 
               <Row className="mb-3">
-                <Col>
+                <Col xs={12} sm={6}>
                   <BootstrapForm.Group controlId="class">
-                    <BootstrapForm.Label>Class</BootstrapForm.Label>
+                    <BootstrapForm.Label className="text-left">Class</BootstrapForm.Label>
                     <Field
                       type="number"
                       name="class"
@@ -103,12 +103,10 @@ const StudentForm = () => {
                     <ErrorMessage name="class" component="div" className="invalid-feedback" />
                   </BootstrapForm.Group>
                 </Col>
-              </Row>
 
-              <Row className="mb-3">
-                <Col>
+                <Col xs={12} sm={6}>
                   <BootstrapForm.Group controlId="division">
-                    <BootstrapForm.Label>Division</BootstrapForm.Label>
+                    <BootstrapForm.Label className="text-left">Division</BootstrapForm.Label>
                     <Field
                       as="select"
                       name="division"
@@ -126,38 +124,37 @@ const StudentForm = () => {
               </Row>
 
               <Row className="mb-3">
-                <Col>
-                    <BootstrapForm.Group controlId="gender">
-                    <BootstrapForm.Label>Gender</BootstrapForm.Label>
+                <Col xs={12}>
+                  <BootstrapForm.Group controlId="gender">
+                    <BootstrapForm.Label className="text-left">Gender</BootstrapForm.Label>
                     <div className="form-check">
-                        <Field
+                      <Field
                         type="radio"
                         name="gender"
                         value="Male"
                         id="genderMale"
                         className={`form-check-input ${touched.gender && errors.gender ? 'is-invalid' : ''}`}
-                        />
-                        <BootstrapForm.Label className="form-check-label" htmlFor="genderMale">
+                      />
+                      <BootstrapForm.Label className="form-check-label" htmlFor="genderMale">
                         Male
-                        </BootstrapForm.Label>
+                      </BootstrapForm.Label>
                     </div>
                     <div className="form-check">
-                        <Field
+                      <Field
                         type="radio"
                         name="gender"
                         value="Female"
                         id="genderFemale"
                         className={`form-check-input ${touched.gender && errors.gender ? 'is-invalid' : ''}`}
-                        />
-                        <BootstrapForm.Label className="form-check-label" htmlFor="genderFemale">
+                      />
+                      <BootstrapForm.Label className="form-check-label" htmlFor="genderFemale">
                         Female
-                        </BootstrapForm.Label>
+                      </BootstrapForm.Label>
                     </div>
                     <ErrorMessage name="gender" component="div" className="invalid-feedback" />
-                    </BootstrapForm.Group>
+                  </BootstrapForm.Group>
                 </Col>
-            </Row>
-
+              </Row>
 
               <Button
                 type="submit"
@@ -169,7 +166,7 @@ const StudentForm = () => {
               </Button>
 
               <div className="mt-3">
-                <Button variant="secondary" onClick={() => navigate('/list')} className="w-100">
+                <Button variant="secondary" onClick={() => navigate('/')} className="w-100">
                   Cancel
                 </Button>
               </div>
