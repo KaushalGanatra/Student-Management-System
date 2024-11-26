@@ -1,6 +1,8 @@
 namespace backend
 {
-    using backend.Context;
+    using backend.Mappings;
+    using backend.Models;
+    using backend.Data;
     using Microsoft.EntityFrameworkCore;
 
     public class Program
@@ -11,10 +13,7 @@ namespace backend
 
             builder.Services.AddControllers();
 
-            builder.Services.AddDbContext<StudentDbContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("myconn")));
-
-            builder.Services.AddDbContext<AttendenceDbContext>(options =>
+            builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("myconn")));
 
             builder.Services.AddCors(options =>
@@ -27,6 +26,8 @@ namespace backend
                            .AllowCredentials();
                 });
             });
+
+            builder.Services.AddAutoMapper(typeof(MappingProfile)); 
 
             var app = builder.Build();
 

@@ -1,8 +1,11 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using backend.Context;
+using backend.Models;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using backend.DTOs;
+using backend.Data;
+using AutoMapper;
 
 namespace backend.Controllers
 {
@@ -10,103 +13,110 @@ namespace backend.Controllers
     [ApiController]
     public class StudentController : Controller
     {
-        private readonly StudentDbContext _studentDbContext;
+        private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public StudentController(StudentDbContext dbc)
+        public StudentController(AppDbContext dbc, IMapper mapper)
         {
-            _studentDbContext = dbc;
+            _context = dbc;
+            _mapper = mapper;
         }
+
 
         [HttpGet]
-        public async Task<IActionResult> listStudents()
+        public async Task<IActionResult> ListStudents()
         {
-            var students = await _studentDbContext.Students.ToListAsync();
-            return Ok(students);
+            var students = await _context.Students.ToListAsync();
+
+            var studentDtos = _mapper.Map<List<StudentDTO>>(students);
+
+            return Ok(studentDtos);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> getStudent(int id)
-        {
-            var student = await _studentDbContext.Students.FindAsync(id);
 
-            if (student == null)
-            {
-                return NotFound(); 
-            }
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> getStudent(int id)
+        //{
+        //    var student = await _studentDbContext.Students.FindAsync(id);
 
-            return Ok(student);
-        }
+        //    if (student == null)
+        //    {
+        //        return NotFound(); 
+        //    }
 
-        [HttpPost]
-        public async Task<IActionResult> postStudent([FromBody] Student student)
-        {
-            if (student == null)
-            {
-                return BadRequest("Student data is required");
-            }
+        //    return Ok(student);
+        //}
 
-            if (string.IsNullOrEmpty(student.Name) ||
-                !student.Class.HasValue ||
-                string.IsNullOrEmpty(student.Division) ||
-                string.IsNullOrEmpty(student.Gender))
-                   
-            {
-                return BadRequest("Post request should contain all of the student data.");
-            }
+        //[HttpPost]
+        //public async Task<IActionResult> postStudent([FromBody] Student student)
+        //{
+        //    if (student == null)
+        //    {
+        //        return BadRequest("Student data is required");
+        //    }
 
-            _studentDbContext.Students.Add(student);
-            await _studentDbContext.SaveChangesAsync();
+        //    if (string.IsNullOrEmpty(student.Name) ||
+        //        !student.Class.HasValue ||
+        //        string.IsNullOrEmpty(student.Division) ||
+        //        !student.Gender)
 
-            return CreatedAtAction(nameof(getStudent), new { id = student.Id }, student);
-        }
+        //    {
+        //        return BadRequest("Post request should contain all of the student data.");
+        //    }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> putStudent(int id, [FromBody] Student student)
-        {
-            var existingStudent = await _studentDbContext.Students.FindAsync(id);
+        //    _studentDbContext.Students.Add(student);
+        //    await _studentDbContext.SaveChangesAsync();
 
-            if (existingStudent == null)
-            {
-                return NotFound();
-            }
+        //    return CreatedAtAction(nameof(getStudent), new { id = student.Id }, student);
+        //}
 
-            // for empty object
-            if (string.IsNullOrEmpty(student.Name) &&
-                !student.Class.HasValue &&
-                string.IsNullOrEmpty(student.Division) &&
-                string.IsNullOrEmpty(student.Gender))
-            {
-                return BadRequest("Student data is required");
-            }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> putStudent(int id, [FromBody] Student student)
+        //{
+        //    var existingStudent = await _studentDbContext.Students.FindAsync(id);
 
-            existingStudent.Name = student.Name ?? existingStudent.Name; 
-            if(student.Class != 0)
-            existingStudent.Name = student.Name ?? existingStudent.Name; 
-            {
-                existingStudent.Class = student.Class ?? existingStudent.Class;
-            }
-            existingStudent.Division = student.Division ?? existingStudent.Division; 
-            existingStudent.Gender = student.Gender ?? existingStudent.Gender;
+        //    if (existingStudent == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            await _studentDbContext.SaveChangesAsync();
+        //    // for empty object
+        //    if (string.IsNullOrEmpty(student.Name) &&
+        //        !student.Class.HasValue &&
+        //        string.IsNullOrEmpty(student.Division) &&
+        //        string.IsNullOrEmpty(student.Gender))
+        //    {
+        //        return BadRequest("Student data is required");
+        //    }
 
-            return Ok(existingStudent);
-        }
+        //    existingStudent.Name = student.Name ?? existingStudent.Name; 
+        //    if(student.Class != 0)
+        //    existingStudent.Name = student.Name ?? existingStudent.Name; 
+        //    {
+        //        existingStudent.Class = student.Class ?? existingStudent.Class;
+        //    }
+        //    existingStudent.Division = student.Division ?? existingStudent.Division; 
+        //    existingStudent.Gender = student.Gender ?? existingStudent.Gender;
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> deleteStudent(int id)
-        {
-            var student = await _studentDbContext.Students.FindAsync(id);
+        //    await _studentDbContext.SaveChangesAsync();
 
-            if (student == null)
-            {
-                return NotFound();
-            }
+        //    return Ok(existingStudent);
+        //}
 
-            _studentDbContext.Students.Remove(student);
-            await _studentDbContext.SaveChangesAsync(); 
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> deleteStudent(int id)
+        //{
+        //    var student = await _studentDbContext.Students.FindAsync(id);
 
-            return NoContent();
-        }
+        //    if (student == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    _studentDbContext.Students.Remove(student);
+        //    await _studentDbContext.SaveChangesAsync(); 
+
+        //    return NoContent();
+        //}
     }
 }

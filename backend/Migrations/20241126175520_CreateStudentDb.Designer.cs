@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using backend.Context;
+using backend.Data;
 
 #nullable disable
 
-namespace backend.Migrations.AttendenceDb
+namespace backend.Migrations
 {
-    [DbContext(typeof(AttendenceDbContext))]
-    [Migration("20241121234417_Attendence")]
-    partial class Attendence
+    [DbContext(typeof(AppDbContext))]
+    [Migration("20241126175520_CreateStudentDb")]
+    partial class CreateStudentDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,27 +25,38 @@ namespace backend.Migrations.AttendenceDb
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("backend.Context.Attendence", b =>
+            modelBuilder.Entity("backend.Models.Student", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Class")
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Status")
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Division")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Student_Id")
+                    b.Property<int>("Gender")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.ToTable("AttendenceDB");
+                    b.ToTable("Students");
                 });
 #pragma warning restore 612, 618
         }
