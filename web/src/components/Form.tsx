@@ -121,7 +121,7 @@ const StudentForm = () => {
                 </Col>
               </Row>
 
-              <Row className="mb-3">
+              <Row className="mb-6">
                 <Col xs={12}>
                   <BootstrapForm.Group controlId="gender">
                     <BootstrapForm.Label className="text-left">Gender</BootstrapForm.Label>
@@ -138,7 +138,7 @@ const StudentForm = () => {
                           Male
                         </BootstrapForm.Label>
                       </div>
-                      <div className="form-check">
+                      <div className="form-check me-3">
                         <Field
                           type="radio"
                           name="gender"
@@ -148,6 +148,18 @@ const StudentForm = () => {
                         />
                         <BootstrapForm.Label className="form-check-label" htmlFor="genderFemale">
                           Female
+                        </BootstrapForm.Label>
+                      </div>
+                      <div className="form-check">
+                        <Field
+                          type="radio"
+                          name="gender"
+                          value="Other"
+                          id="genderOther"
+                          className={`form-check-input ${touched.gender && errors.gender ? 'is-invalid' : ''}`}
+                        />
+                        <BootstrapForm.Label className="form-check-label" htmlFor="genderOther">
+                          Other
                         </BootstrapForm.Label>
                       </div>
                     </div>
