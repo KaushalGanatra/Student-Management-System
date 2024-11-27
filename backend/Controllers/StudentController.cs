@@ -1,110 +1,100 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using backend.Context;
+using backend.Models;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using backend.DTOs;
+using FluentValidation.Results;
+using System.ComponentModel.DataAnnotations;
+using backend.Repositories.Interfaces;
+using backend.Repositories.Implementations;
 
 namespace backend.Controllers
 {
-    [Route("api/student")]  
+    [Route("api/student")]
     [ApiController]
-    public class StudentController : Controller
+    public class StudentController : ControllerBase
     {
-        private readonly StudentDbContext _studentDbContext;
+        private readonly IStudentRepository _studentRepository;
 
-        public StudentController(StudentDbContext dbc)
+        public StudentController(IStudentRepository studentRepository)
         {
-            _studentDbContext = dbc;
+            _studentRepository = studentRepository;
         }
 
         [HttpGet]
-        public async Task<IActionResult> listStudents()
+        public async Task<IActionResult> List()
         {
-            var students = await _studentDbContext.Students.ToListAsync();
+            var students = await _studentRepository.ListAllStudents();
+            if (students == null || !students.Any())
+            {
+                return NotFound("No students found");
+            }
             return Ok(students);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> getStudent(int id)
+        [HttpPost]
+        public async Task<IActionResult> Add(StudentDTO studentDto)
         {
-            var student = await _studentDbContext.Students.FindAsync(id);
+            var createdStudent = await _studentRepository.AddStudent(studentDto);
+            if (createdStudent == null)
+            {
+                return NotFound("Provide all of the student details");
+            }
+            return Created(string.Empty, createdStudent);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetStudentById(string id)
+        {
+            if (!Guid.TryParse(id, out var parsedId))
+            {
+                return BadRequest("The provided ID is not valid.");
+            }
+
+            var student = await _studentRepository.GetStudentById(parsedId);
 
             if (student == null)
             {
-                return NotFound(); 
+                return NotFound("Provided student id not found");
             }
 
             return Ok(student);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> postStudent([FromBody] Student student)
-        {
-            if (student == null)
-            {
-                return BadRequest("Student data is required");
-            }
-
-            if (string.IsNullOrEmpty(student.Name) ||
-                !student.Class.HasValue ||
-                string.IsNullOrEmpty(student.Division) ||
-                string.IsNullOrEmpty(student.Gender))
-                   
-            {
-                return BadRequest("Post request should contain all of the student data.");
-            }
-
-            _studentDbContext.Students.Add(student);
-            await _studentDbContext.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(getStudent), new { id = student.Id }, student);
-        }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> putStudent(int id, [FromBody] Student student)
+        public async Task<IActionResult> UpdateStudent(string id, [FromBody] StudentDTO studentDto)
         {
-            var existingStudent = await _studentDbContext.Students.FindAsync(id);
-
-            if (existingStudent == null)
+            if (!Guid.TryParse(id, out var parsedId))
             {
-                return NotFound();
+                return BadRequest("The provided ID is not valid.");
             }
 
-            // for empty object
-            if (string.IsNullOrEmpty(student.Name) &&
-                !student.Class.HasValue &&
-                string.IsNullOrEmpty(student.Division) &&
-                string.IsNullOrEmpty(student.Gender))
+            var updatedStudent = await _studentRepository.UpdateStudent(parsedId,studentDto);
+
+            if(updatedStudent==null)
             {
-                return BadRequest("Student data is required");
+                return BadRequest("Student with provided ID not found");
             }
 
-            existingStudent.Name = student.Name ?? existingStudent.Name; 
-            if(student.Class != 0)
-            existingStudent.Name = student.Name ?? existingStudent.Name; 
-            {
-                existingStudent.Class = student.Class ?? existingStudent.Class;
-            }
-            existingStudent.Division = student.Division ?? existingStudent.Division; 
-            existingStudent.Gender = student.Gender ?? existingStudent.Gender;
+            return Ok(updatedStudent);
 
-            await _studentDbContext.SaveChangesAsync();
-
-            return Ok(existingStudent);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> deleteStudent(int id)
+        public async Task<IActionResult> DeleteStudent(string id)
         {
-            var student = await _studentDbContext.Students.FindAsync(id);
-
-            if (student == null)
+            if (!Guid.TryParse(id, out var parsedId))
             {
-                return NotFound();
+                return BadRequest("The provided ID is not valid.");
             }
 
-            _studentDbContext.Students.Remove(student);
-            await _studentDbContext.SaveChangesAsync(); 
+            var isDeleted = await _studentRepository.DeleteStudent(parsedId);
+            if (!isDeleted)
+            {
+                return NotFound("Student with provided ID not found");
+            }
 
             return NoContent();
         }
