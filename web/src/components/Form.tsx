@@ -21,7 +21,7 @@ const StudentForm = () => {
 
   useEffect(() => {
     if (id) {
-      fetchStudentData(Number(id));
+      fetchStudentData(id);
     }
   }, [id]);
 

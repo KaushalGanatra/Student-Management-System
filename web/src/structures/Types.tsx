@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 
 export type Student = {
-    id?: number;
+    id?: string;
     name: string;
     class: string;
     division: string;

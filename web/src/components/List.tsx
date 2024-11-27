@@ -52,7 +52,7 @@ function StudentList() {
     }
   };
 
-  const handleDelete = async (id: number): Promise<void> => {
+  const handleDelete = async (id: string): Promise<void> => {
     try {
       await axios.delete(`http://localhost:5027/api/student/${id}`);
       fetchStudents();
