@@ -5,14 +5,14 @@ namespace backend.Repositories.Interfaces
 {
     public interface IStudentRepository
     {
-        Task<IEnumerable<StudentDTO>> GetAllStudents();
+        Task<IEnumerable<StudentDTO>> ListAllStudents();
 
-        //StudentDTO GetStudentById(string id);
+        Task<StudentDTO> GetStudentById(Guid id);
 
-        //void AddStudent(StudentDTO studentDto);
+        Task<StudentDTO> AddStudent(StudentDTO studentDto);
 
-        //void UpdateStudent(StudentDTO studentdto);
+        Task<StudentDTO> UpdateStudent(Guid id, StudentDTO studentdto);
 
-        //void DeleteStudent(string id);
+        Task<bool> DeleteStudent(Guid id);
     }
 }

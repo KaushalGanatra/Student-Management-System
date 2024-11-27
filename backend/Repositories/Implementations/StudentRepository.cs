@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +6,7 @@ using backend.Models;
 using backend.DTOs;
 using backend.Data;
 using AutoMapper;
+using FluentValidation.Results;
 using backend.Repositories.Interfaces;
 
 namespace backend.Repositories.Implementations
@@ -20,51 +22,89 @@ namespace backend.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<IEnumerable<StudentDTO>> GetAllStudents()
+        public async Task<IEnumerable<StudentDTO>> ListAllStudents()
         {
             var students = await _context.Students.Where(s => s.DeletedAt == null).ToListAsync();
             var studentDtos = _mapper.Map<List<StudentDTO>>(students);
             return studentDtos;
         }
 
-        //// Get a product by ID as a DTO
-        //public ProductDTO GetProductById(int id)
-        //{
-        //    var product = _context.Products
-        //        .Where(p => p.Id == id)
-        //        .Select(p => new ProductDTO
-        //        {
-        //            Id = p.Id,
-        //            Name = p.Name,
-        //            Price = p.Price
-        //        }).FirstOrDefault();
+        public async Task<StudentDTO> GetStudentById(Guid id)
+        {
+            var student = await _context.Students.Where(s => s.DeletedAt == null && s.Id == id).FirstOrDefaultAsync();
 
-        //    return product;
-        //}
+            if (student == null)
+            {
+                return null;
+            }
 
-        //// Add a new product
-        //public void AddProduct(Product product)
-        //{
-        //    _context.Products.Add(product);
-        //    _context.SaveChanges();
-        //}
+            var studentDto = _mapper.Map<StudentDTO>(student);
 
-        //// Update an existing product
-        //public void UpdateProduct(Product product)
-        //{
-        //    _context.Entry(product).State = EntityState.Modified;
-        //    _context.SaveChanges();
-        //}
+            return studentDto;
+        }
 
-        //// Delete a product by ID
-        //public void DeleteProduct(int id)
-        //{
-        //    var product = _context.Products.Find(id);
-        //    if (product != null)
-        //    {
-        //        _context.Products.Remove(product);
-        //        _context.SaveChanges();
-        //    }
-        //}
+        public async Task<StudentDTO> AddStudent(StudentDTO studentDto)
+        {
+            if (studentDto == null)
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(studentDto.Name) ||
+                !studentDto.Class.HasValue ||
+                string.IsNullOrEmpty(studentDto.Division) ||
+                string.IsNullOrEmpty(studentDto.Gender))
+            {
+                return null;
+            }
+
+            var student = _mapper.Map<Student>(studentDto);
+            student.UpdatedAt = DateTime.UtcNow;
+
+            _context.Students.Add(student);
+            await _context.SaveChangesAsync();
+
+            var createdStudentDto = _mapper.Map<StudentDTO>(student);
+
+            return createdStudentDto;
+        }
+
+        public async Task<StudentDTO> UpdateStudent(Guid id, StudentDTO studentDto)
+        {
+            var existingStudent = await _context.Students.Where(s => s.DeletedAt == null && s.Id == id).FirstOrDefaultAsync();
+
+            if (existingStudent == null)
+            {
+                return null;
+            }
+
+            //empty object
+            if (string.IsNullOrEmpty(studentDto.Name) &&
+                !studentDto.Class.HasValue &&
+                string.IsNullOrEmpty(studentDto.Division) &&
+                string.IsNullOrEmpty(studentDto.Gender))
+            {
+                return null;
+            }
+            existingStudent = _mapper.Map(studentDto,existingStudent);
+            existingStudent.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            Console.WriteLine("EXISTING: "+existingStudent);
+            return _mapper.Map<StudentDTO>(existingStudent); 
+        }
+
+        public async Task<bool> DeleteStudent(Guid id)
+        {
+            var student = await _context.Students.Where(s => s.DeletedAt == null && s.Id == id).FirstOrDefaultAsync();
+            if (student == null)
+            {
+                return false;
+            }
+            student.DeletedAt = DateTime.UtcNow;
+            student.UpdatedAt = DateTime.UtcNow;
+            _context.Students.Update(student);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
