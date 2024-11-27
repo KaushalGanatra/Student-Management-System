@@ -16,6 +16,7 @@ namespace backend.Mappings
 
             // Mapping from StudentDTO to Student (for PUT, PATCH, etc.)
             CreateMap<StudentDTO, Student>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Name, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Name)))  // Update only if not null or empty
                 .ForMember(dest => dest.Class, opt => opt.Condition(src => src.Class.HasValue))  
                 .ForMember(dest => dest.Division, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Division))) 
@@ -29,7 +30,6 @@ namespace backend.Mappings
     {
         public Gender Resolve(StudentDTO source, Student destination, Gender destMember, ResolutionContext context)
         {
-            // Check if src.Gender is not null; if so, parse it; otherwise, return the existing value
             return !string.IsNullOrEmpty(source.Gender) ? ParseGenderFromString(source.Gender) : destMember;
         }
 
