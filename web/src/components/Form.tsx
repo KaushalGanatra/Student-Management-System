@@ -25,7 +25,7 @@ const StudentForm = () => {
     }
   }, [id]);
 
-  const fetchStudentData = async (studentId: number) => {
+  const fetchStudentData = async (studentId: string) => {
     setLoading(true);
     try {
       const response = await axios.get<Student>(`http://localhost:5027/api/student/${studentId}`);
