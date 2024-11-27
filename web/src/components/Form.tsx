@@ -73,7 +73,7 @@ const StudentForm = () => {
             <Form>
               <Row className="mb-3">
                 <Col xs={12}>
-                  <BootstrapForm.Group controlId="name">
+                  <BootstrapForm.Group>
                     <BootstrapForm.Label className="text-left">Full Name</BootstrapForm.Label>
                     <Field
                       type="text"
@@ -89,7 +89,7 @@ const StudentForm = () => {
 
               <Row className="mb-3">
                 <Col xs={12} sm={6}>
-                  <BootstrapForm.Group controlId="class">
+                  <BootstrapForm.Group>
                     <BootstrapForm.Label className="text-left">Class</BootstrapForm.Label>
                     <Field
                       type="number"
@@ -103,7 +103,7 @@ const StudentForm = () => {
                 </Col>
 
                 <Col xs={12} sm={6}>
-                  <BootstrapForm.Group controlId="division">
+                  <BootstrapForm.Group>
                     <BootstrapForm.Label className="text-left">Division</BootstrapForm.Label>
                     <Field
                       as="select"
@@ -123,7 +123,7 @@ const StudentForm = () => {
 
               <Row className="mb-6">
                 <Col xs={12}>
-                  <BootstrapForm.Group controlId="gender">
+                  <BootstrapForm.Group>
                     <BootstrapForm.Label className="text-left">Gender</BootstrapForm.Label>
                     <div className="d-flex">
                       <div className="form-check me-3">
