@@ -7,11 +7,11 @@ namespace backend.Repositories.Interfaces
     {
         Task<IEnumerable<StudentDTO>> ListAllStudents();
 
-        Task<StudentDTO> GetStudentById(Guid id);
+        Task<StudentDTO?> GetStudentById(Guid id);
 
-        Task<StudentDTO> AddStudent(StudentDTO studentDto);
+        Task<StudentDTO?> AddStudent(StudentDTO studentDto);
 
-        Task<StudentDTO> UpdateStudent(Guid id, StudentDTO studentdto);
+        Task<StudentDTO?> UpdateStudent(Guid id, StudentDTO studentdto);
 
         Task<bool> DeleteStudent(Guid id);
     }

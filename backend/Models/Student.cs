@@ -14,19 +14,19 @@ namespace backend.Models
     public class Student
     {
         [Key]
-        public Guid Id { get; set; }
+        public required Guid Id { get; set; }
 
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
-        public int Class { get; set; }
+        public required int Class { get; set; }
 
-        public string Division { get; set; }
+        public required string Division { get; set; }
 
-        public Gender Gender { get; set; }
+        public required Gender Gender { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public required DateTime CreatedAt { get; set; }
 
-        public DateTime UpdatedAt { get; set; }
+        public required DateTime UpdatedAt { get; set; }
 
         public DateTime? DeletedAt { get; set; }
 

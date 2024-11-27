@@ -29,7 +29,7 @@ namespace backend.Repositories.Implementations
             return studentDtos;
         }
 
-        public async Task<StudentDTO> GetStudentById(Guid id)
+        public async Task<StudentDTO?> GetStudentById(Guid id)
         {
             var student = await _context.Students.Where(s => s.DeletedAt == null && s.Id == id).FirstOrDefaultAsync();
 
@@ -43,7 +43,7 @@ namespace backend.Repositories.Implementations
             return studentDto;
         }
 
-        public async Task<StudentDTO> AddStudent(StudentDTO studentDto)
+        public async Task<StudentDTO?> AddStudent(StudentDTO studentDto)
         {
             if (studentDto == null)
             {
@@ -69,7 +69,7 @@ namespace backend.Repositories.Implementations
             return createdStudentDto;
         }
 
-        public async Task<StudentDTO> UpdateStudent(Guid id, StudentDTO studentDto)
+        public async Task<StudentDTO?> UpdateStudent(Guid id, StudentDTO studentDto)
         {
             var existingStudent = await _context.Students.Where(s => s.DeletedAt == null && s.Id == id).FirstOrDefaultAsync();
 

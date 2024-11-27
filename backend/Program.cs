@@ -32,7 +32,8 @@ namespace backend
             });
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
-            builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<StudentValidator>());
+            builder.Services.AddValidatorsFromAssemblyContaining<StudentValidator>();
+
             builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 
             var app = builder.Build();

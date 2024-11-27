@@ -11,7 +11,7 @@ public class StudentValidator : AbstractValidator<StudentDTO>
         RuleFor(s => s.Division).Must(BeAValidDivision).WithMessage("Division must be one of the following: A,B,C").When(s => !string.IsNullOrEmpty(s.Division));
     }
 
-    private bool BeAValidGender(string gender)
+    private bool BeAValidGender(string? gender)
     {
         if (Enum.TryParse<Gender>(gender, true, out var parsedGender))
         {
@@ -20,7 +20,7 @@ public class StudentValidator : AbstractValidator<StudentDTO>
         return false;
     }
 
-    private bool BeAValidDivision(string division)
+    private bool BeAValidDivision(string? division)
     {
         return division == "A" || division == "B" || division == "C";
     }
