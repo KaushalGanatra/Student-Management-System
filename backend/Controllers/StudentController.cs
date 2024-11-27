@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using backend.DTOs;
 using backend.Data;
 using AutoMapper;
+using FluentValidation.Results;
+using System.ComponentModel.DataAnnotations;
 
 namespace backend.Controllers
 {
@@ -48,6 +50,7 @@ namespace backend.Controllers
             {
                 return NotFound("Provided student id not found");
             }
+
             var studentDtos = _mapper.Map<StudentDTO>(student);
 
             return Ok(studentDtos);

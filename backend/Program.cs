@@ -4,6 +4,8 @@ namespace backend
     using backend.Models;
     using backend.Data;
     using Microsoft.EntityFrameworkCore;
+    using FluentValidation;
+    using FluentValidation.AspNetCore;
 
     public class Program
     {
@@ -27,7 +29,8 @@ namespace backend
                 });
             });
 
-            builder.Services.AddAutoMapper(typeof(MappingProfile)); 
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
+            builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<StudentValidator>());
 
             var app = builder.Build();
 

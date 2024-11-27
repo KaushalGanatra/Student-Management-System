@@ -35,12 +35,12 @@ namespace backend.Mappings
 
         private Gender ParseGenderFromString(string gender)
         {
-            if (Enum.TryParse<Gender>(gender, true, out var parsedGender))  // Ignore case when parsing
+            if (Enum.TryParse<Gender>(gender, true, out var parsedGender))  
             {
                 return parsedGender;
             }
 
-            return Gender.Undefined;  // Default to Gender.Male if parsing fails or gender is invalid
+            return Gender.Undefined;
         }
     }
 }
