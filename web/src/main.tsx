@@ -1,13 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './stylesheets/index.css'
-import App from './pages/App.tsx'
+import App from './App.tsx'
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import List from './components/List.tsx';
-import Form from './components/Form.tsx';
+// import StudentList from './components/List.tsx';
+import StudentForm from './components/Form.tsx';
 
 const router = createBrowserRouter([
   {
@@ -16,11 +16,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/form",
-    element: <Form />
+    element: <StudentForm />
   },
   {
     path: '/form/:id',
-    element: <Form />
+    element: <StudentForm />
   }
 ]);
 

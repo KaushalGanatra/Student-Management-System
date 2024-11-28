@@ -1,10 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import List from '../components/List';
+import StudentList from './pages/StudentList';
 
 function App() {
   return (
     <>
-    <List></List>
+    <StudentList></StudentList>
     </>
   )
 }
