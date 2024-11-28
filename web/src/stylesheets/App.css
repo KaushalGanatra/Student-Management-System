@@ -1,54 +1,67 @@
-/* Ensure full-height layout for the body and root */
+/* Ensure full height and width for the body and root */
 body, html {
   height: 100%;
   margin: 0;
+  width: 100%;
   background-color: rgb(153, 151, 151);
 }
 
+/* Root element takes full height and width */
 #root {
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   padding: 0;
 }
 
+/* Full-width container */
 .student-list-container {
   height: 100%;
   display: flex;
   flex-direction: column;
+  width: 100%; /* Make sure this container fills the full width */
 }
 
+/* Full-width header container */
 .header-search-container {
   padding: 1rem;
-  flex-shrink: 0; /* Prevent the header from shrinking */
+  flex-shrink: 0;
+  width: 100%; /* Ensure the header takes full width */
 }
 
+/* Card should stretch full width */
 .header-card {
   border: none;
+  width: 100%; /* Full-width card */
   margin-bottom: 1rem;
 }
 
-/* Full width search bar */
+/* Ensure full width for search bar or other components */
 .search-container {
   width: 100%;
 }
 
+/* Table container should grow to fill remaining space */
 .table-container {
   flex-grow: 1;
+  width: 100%; /* Ensure this takes up the available space */
 }
 
+/* Make sure the table takes full width */
 .student-table {
   width: 100%;
   table-layout: fixed;
   height: 100%;
 }
 
-/* Spinner style */
+/* Spinner takes full width and height */
 .spinner-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
+  width: 100%;
 }
 
 /* Modal settings */

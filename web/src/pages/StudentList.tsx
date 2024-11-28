@@ -1,4 +1,3 @@
-// src/pages/StudentList.tsx
 import { useState, useEffect } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { Student } from '../structures/Types';
@@ -61,6 +60,11 @@ const StudentList = () => {
             <Link to={`/form`} className="ms-auto">
               <Button variant="light" className="d-flex align-items-center">
                 <span className="me-0">+</span> Add Student
+              </Button>
+            </Link>
+            <Link to={`/attendence`} className="ms-auto">
+              <Button variant="light" className="d-flex align-items-center">
+                <span className="me-0"></span> Fill Attendence
               </Button>
             </Link>
           </Card.Header>

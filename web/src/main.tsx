@@ -6,8 +6,8 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-// import StudentList from './components/List.tsx';
 import StudentForm from './components/Form.tsx';
+import StudentAttendence from './pages/StudentAttendence.tsx';
 
 const router = createBrowserRouter([
   {
@@ -21,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: '/form/:id',
     element: <StudentForm />
+  },
+  {
+    path: '/attendence',
+    element: <StudentAttendence />
   }
 ]);
 

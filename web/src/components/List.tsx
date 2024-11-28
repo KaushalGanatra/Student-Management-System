@@ -1,4 +1,3 @@
-// src/components/List.tsx
 import { Table, Button, Spinner, Modal } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Student } from '../structures/Types';
