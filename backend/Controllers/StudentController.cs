@@ -23,9 +23,9 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List(int? sClass,string? sDivision)
         {
-            var students = await _studentRepository.ListAllStudents();
+            var students = await _studentRepository.ListAllStudents(sClass, sDivision);
             if (students == null || !students.Any())
             {
                 return NotFound("No students found");

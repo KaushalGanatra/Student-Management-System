@@ -22,9 +22,19 @@ namespace backend.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<IEnumerable<StudentDTO>> ListAllStudents()
+        public async Task<IEnumerable<StudentDTO>> ListAllStudents(int? sClass, string? sDivision)
         {
-            var students = await _context.Students.Where(s => s.DeletedAt == null).ToListAsync();
+            var query = _context.Students.Where(s => s.DeletedAt == null);
+            if(sClass.HasValue)
+            {
+                query = query.Where(s => s.Class == sClass);
+            }
+            if(!string.IsNullOrEmpty(sDivision))
+            {
+                query = query.Where(s => s.Division.Equals(sDivision.ToUpper()));
+            }
+
+            var students = await query.ToListAsync();
             var studentDtos = _mapper.Map<List<StudentDTO>>(students);
             return studentDtos;
         }
