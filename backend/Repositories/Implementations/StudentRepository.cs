@@ -79,6 +79,21 @@ namespace backend.Repositories.Implementations
             return createdStudentDto;
         }
 
+        //For Modifications and refector
+
+        //public async Task<StudentDTO?> AddStudent(StudentDTO studentDto)
+        //{
+        //    var student = _mapper.Map<Student>(studentDto);
+        //    student.UpdatedAt = DateTime.UtcNow;
+
+        //    _context.Students.Add(student);
+        //    await _context.SaveChangesAsync();
+
+        //    var createdStudentDto = _mapper.Map<StudentDTO>(student);
+
+        //    return createdStudentDto;
+        //}
+
         public async Task<StudentDTO?> UpdateStudent(Guid id, StudentDTO studentDto)
         {
             var existingStudent = await _context.Students.Where(s => s.DeletedAt == null && s.Id == id).FirstOrDefaultAsync();
