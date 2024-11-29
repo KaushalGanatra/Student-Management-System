@@ -12,7 +12,7 @@ const StudentAttendance = () => {
   const [selectedClass, setSelectedClass] = useState<string>('');
   const [selectedDivision, setSelectedDivision] = useState<string>('');
   const [classes, setClasses] = useState<Class[]>([]);
-  const [divisions, setDivisions] = useState<Class[]>([]);
+  const [divisions, setDivisions] = useState<Division[]>([]);
   const baseUrl = 'http://localhost:5027/api';
 
   const fetchClasses = useCallback(async () => {
