@@ -23,6 +23,9 @@ namespace backend.Mappings
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())  
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow)) 
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom<GenderResolver>()); // Use custom resolver for Gender
+
+            CreateMap<ClassDTO, Class>();
+            CreateMap<Class, ClassDTO>();
         }
     }
 

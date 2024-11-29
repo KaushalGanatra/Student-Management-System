@@ -2,11 +2,10 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { Formik, Field, Form } from 'formik';
 import axios, { AxiosResponse } from 'axios';
-import { Student } from '../structures/Types';
+import { Student, Class } from '../structures/Types';
 import { Table, Button, Card, Row, Col } from 'react-bootstrap';
 import '../stylesheets/App.css';
 
-const classes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
 const divisions = ['A', 'B', 'C'];
 
 const StudentAttendance = () => {
@@ -14,10 +13,17 @@ const StudentAttendance = () => {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedClass, setSelectedClass] = useState<string>('');
   const [selectedDivision, setSelectedDivision] = useState<string>('');
+  const [classes, setClasses] = useState<Class[]>([]);
+  const baseUrl = 'http://localhost:5027/api';
+
+  const fetchClasses = useCallback(async () => {
+    const classUrl = `${baseUrl}/class`;
+    const classResponse: AxiosResponse<Class[]> = await axios.get(classUrl);
+    setClasses(classResponse.data);
+  },[]);
 
   const fetchStudents = useCallback(async () => {
     try {
-      const baseUrl = 'http://localhost:5027/api/student';
       let params = new URLSearchParams();
       
       if (selectedClass) {
@@ -28,9 +34,9 @@ const StudentAttendance = () => {
         params.append('sDivision', selectedDivision);
       }
 
-      const url = `${baseUrl}?${params.toString()}`;
+      const studentUrl = `${baseUrl}/student?${params.toString()}`;
       
-      const response: AxiosResponse<Student[]> = await axios.get(url);
+      const response: AxiosResponse<Student[]> = await axios.get(studentUrl);
       setStudents(response.data);
     } catch (err) {
       console.error('Error fetching students:', err);
@@ -41,6 +47,7 @@ const StudentAttendance = () => {
   }, [selectedClass, selectedDivision]);
 
   useEffect(() => {
+    fetchClasses();
     const today = new Date().toISOString().split('T')[0];
     setSelectedDate(today);  
     fetchStudents();
@@ -110,9 +117,9 @@ const StudentAttendance = () => {
                         value={values.class}
                       >
                         <option value="">Select Class</option>
-                        {classes.map((cls, idx) => (
-                          <option key={idx} value={cls}>
-                            {cls}
+                        {classes.map((classes) => (
+                          <option key={classes.id} value={classes.classNumber}>
+                            {classes.classNumber}
                           </option>
                         ))}
                       </Field>

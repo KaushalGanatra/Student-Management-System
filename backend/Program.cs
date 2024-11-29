@@ -33,8 +33,10 @@ namespace backend
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddValidatorsFromAssemblyContaining<StudentValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<ClassValidator>();
 
             builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+            builder.Services.AddScoped<IClassRepository, ClassRepository>();
 
             var app = builder.Build();
 
