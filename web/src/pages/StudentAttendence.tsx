@@ -1,32 +1,51 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Formik, Field, Form } from 'formik';
 import axios, { AxiosResponse } from 'axios';
 import { Student } from '../structures/Types';
 import { Table, Button, Card, Row, Col } from 'react-bootstrap';
 import '../stylesheets/App.css';
 
-const classes = ['1', '2', '3'];
-const divisions = ['A', 'B', 'C', 'D'];
+const classes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+const divisions = ['A', 'B', 'C'];
 
-const StudentAttendence = () => {
+const StudentAttendance = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedClass, setSelectedClass] = useState<string>('');
+  const [selectedDivision, setSelectedDivision] = useState<string>('');
 
-  useEffect(() => {
-    fetchStudents();
-    const today = new Date().toISOString().split('T')[0];
-    setSelectedDate(today);  
-  }, []);
-
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     try {
-      const response: AxiosResponse<Student[]> = await axios.get('http://localhost:5027/api/student');
+      const baseUrl = 'http://localhost:5027/api/student';
+      let params = new URLSearchParams();
+      
+      if (selectedClass) {
+        params.append('sClass', selectedClass);
+      }
+
+      if (selectedDivision) {
+        params.append('sDivision', selectedDivision);
+      }
+
+      const url = `${baseUrl}?${params.toString()}`;
+      
+      const response: AxiosResponse<Student[]> = await axios.get(url);
       setStudents(response.data);
     } catch (err) {
       console.error('Error fetching students:', err);
     }
-  };
+  }, [selectedClass, selectedDivision]);
+
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    setSelectedDate(today);  
+    fetchStudents();
+  }, []);
+
+  useEffect(() => {
+    fetchStudents();
+  }, [selectedClass, selectedDivision, fetchStudents]);
 
   const handleSubmit = (values: any) => {
     const attendanceData = students.map((student) => ({
@@ -36,6 +55,16 @@ const StudentAttendence = () => {
     }));
 
     console.log('Attendance data:', attendanceData);
+  };
+
+  const handleClassChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setSelectedClass(value);
+  };
+
+  const handleDivisionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setSelectedDivision(value);
   };
 
   return (
@@ -53,8 +82,8 @@ const StudentAttendence = () => {
           <Card.Body>
             <Formik
               initialValues={{
-                class: '',
-                division: '',
+                class: selectedClass,
+                division: selectedDivision,
                 date: selectedDate,
                 ...students.reduce((acc, student) => {
                   acc[`attendance-${student.id}`] = false;
@@ -67,7 +96,16 @@ const StudentAttendence = () => {
                 <Form>
                   <Row className="mb-3">
                     <Col sm={4}>
-                      <Field as="select" name="class" className="form-control">
+                      <Field 
+                        as="select" 
+                        name="class" 
+                        className="form-control" 
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                          handleClassChange(e);
+                          setFieldValue('class', e.target.value); 
+                        }} 
+                        value={values.class}
+                      >
                         <option value="">Select Class</option>
                         {classes.map((cls, idx) => (
                           <option key={idx} value={cls}>
@@ -77,7 +115,16 @@ const StudentAttendence = () => {
                       </Field>
                     </Col>
                     <Col sm={4}>
-                      <Field as="select" name="division" className="form-control">
+                      <Field 
+                        as="select" 
+                        name="division" 
+                        className="form-control" 
+                        onChange={(e:React.ChangeEvent<HTMLSelectElement>) => {
+                          handleDivisionChange(e);
+                          setFieldValue('division', e.target.value);
+                        }} 
+                        value={values.division}
+                      >
                         <option value="">Select Division</option>
                         {divisions.map((div, idx) => (
                           <option key={idx} value={div}>
@@ -136,4 +183,4 @@ const StudentAttendence = () => {
   );
 };
 
-export default StudentAttendence;
+export default StudentAttendance;
