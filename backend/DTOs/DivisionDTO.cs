@@ -4,7 +4,7 @@ namespace backend.DTOs
 {
     public class DivisionDTO
     {
-        public int ID { get; set; }
+        public string? ID { get; set; }
         public string DivisionName { get; set; }
     }
 }

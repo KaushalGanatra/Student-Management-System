@@ -2,11 +2,9 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { Formik, Field, Form } from 'formik';
 import axios, { AxiosResponse } from 'axios';
-import { Student, Class } from '../structures/Types';
+import { Student, Class, Division } from '../structures/Types';
 import { Table, Button, Card, Row, Col } from 'react-bootstrap';
 import '../stylesheets/App.css';
-
-const divisions = ['A', 'B', 'C'];
 
 const StudentAttendance = () => {
   const [students, setStudents] = useState<Student[]>([]);
@@ -14,12 +12,19 @@ const StudentAttendance = () => {
   const [selectedClass, setSelectedClass] = useState<string>('');
   const [selectedDivision, setSelectedDivision] = useState<string>('');
   const [classes, setClasses] = useState<Class[]>([]);
+  const [divisions, setDivisions] = useState<Class[]>([]);
   const baseUrl = 'http://localhost:5027/api';
 
   const fetchClasses = useCallback(async () => {
     const classUrl = `${baseUrl}/class`;
     const classResponse: AxiosResponse<Class[]> = await axios.get(classUrl);
     setClasses(classResponse.data);
+  },[]);
+
+  const fetchDivisions = useCallback(async () => {
+    const divisionUrl = `${baseUrl}/division`;
+    const divisionResponse: AxiosResponse<Division[]> = await axios.get(divisionUrl);
+    setDivisions(divisionResponse.data);
   },[]);
 
   const fetchStudents = useCallback(async () => {
@@ -48,6 +53,7 @@ const StudentAttendance = () => {
 
   useEffect(() => {
     fetchClasses();
+    fetchDivisions();
     const today = new Date().toISOString().split('T')[0];
     setSelectedDate(today);  
     fetchStudents();
@@ -136,9 +142,9 @@ const StudentAttendance = () => {
                         value={values.division}
                       >
                         <option value="">Select Division</option>
-                        {divisions.map((div, idx) => (
-                          <option key={idx} value={div}>
-                            {div}
+                        {divisions.map((divisions) => (
+                          <option key={divisions.id} value={divisions.divisionName}>
+                            {divisions.divisionName}
                           </option>
                         ))}
                       </Field>

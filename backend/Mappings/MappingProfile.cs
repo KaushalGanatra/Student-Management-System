@@ -1,6 +1,7 @@
 using AutoMapper;
 using backend.Models; 
-using backend.DTOs;   
+using backend.DTOs;
+using System.Numerics;
 
 namespace backend.Mappings
 {
@@ -26,6 +27,9 @@ namespace backend.Mappings
 
             CreateMap<ClassDTO, Class>();
             CreateMap<Class, ClassDTO>();
+
+            CreateMap<DivisionDTO, Division>();
+            CreateMap<Division, DivisionDTO>();
         }
     }
 

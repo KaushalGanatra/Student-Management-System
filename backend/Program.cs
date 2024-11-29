@@ -37,6 +37,7 @@ namespace backend
 
             builder.Services.AddScoped<IStudentRepository, StudentRepository>();
             builder.Services.AddScoped<IClassRepository, ClassRepository>();
+            builder.Services.AddScoped<IDivisionRepository, DivisionRepository>();
 
             var app = builder.Build();
 
