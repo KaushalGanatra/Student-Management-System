@@ -34,6 +34,9 @@ const StudentAttendance = () => {
       setStudents(response.data);
     } catch (err) {
       console.error('Error fetching students:', err);
+      if(err.response.status == 404) {
+        setStudents([]);
+      }
     }
   }, [selectedClass, selectedDivision]);
 
@@ -152,7 +155,8 @@ const StudentAttendance = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {students.map((student) => (
+                      {students.length > 0 ? (
+                      students.map((student) => (
                         <tr key={student.id}>
                           <td>{student.name}</td>
                           <td>
@@ -166,7 +170,14 @@ const StudentAttendance = () => {
                             />
                           </td>
                         </tr>
-                      ))}
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={2} className="text-center">
+                          No students found
+                        </td>
+                      </tr>
+                    )}
                     </tbody>
                   </Table>
 
