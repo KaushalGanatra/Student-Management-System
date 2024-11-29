@@ -23,7 +23,7 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> List(int? sClass,string? sDivision)
+        public async Task<IActionResult> ListStudents(int? sClass,string? sDivision)
         {
             var students = await _studentRepository.ListAllStudents(sClass, sDivision);
             if (students == null || !students.Any())
@@ -34,7 +34,7 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(StudentDTO studentDto)
+        public async Task<IActionResult> AddStudent(StudentDTO studentDto)
         {
             var createdStudent = await _studentRepository.AddStudent(studentDto);
             if (createdStudent == null)
