@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { Formik, Field, Form } from 'formik';
 import axios, { AxiosResponse } from 'axios';
-import { Student, Class, Division } from '../structures/Types';
+import { Student, Class, Division, AttendenceData } from '../structures/Types';
 import { Table, Button, Card, Row, Col } from 'react-bootstrap';
 import '../stylesheets/App.css';
 
@@ -14,6 +14,9 @@ const StudentAttendance = () => {
   const [classes, setClasses] = useState<Class[]>([]);
   const [divisions, setDivisions] = useState<Division[]>([]);
   const baseUrl = 'http://localhost:5027/api';
+  const [todayDate, setTodayDate] = useState<string>('');
+  const [enableSubmit, setEnableSubmit] = useState<boolean>(true);
+  const [submitLabel, setSubmitLabel] = useState<string>('Submit');
 
   const fetchClasses = useCallback(async () => {
     const classUrl = `${baseUrl}/class`;
@@ -26,6 +29,11 @@ const StudentAttendance = () => {
     const divisionResponse: AxiosResponse<Division[]> = await axios.get(divisionUrl);
     setDivisions(divisionResponse.data);
   }, []);
+
+  // const fetchAttendenceData = useCallback(async () => {
+  //     const attendenceUrl = `${baseUrl}/attendence?attendenceDate=`+selectedDate;
+  //     const attendenceReponse: AxiosResponse<AttendenceData[]> = await axios.get(attendenceUrl)
+  // }, [selectedDate]);
 
   const fetchStudents = useCallback(async () => {
     try {
@@ -53,14 +61,28 @@ const StudentAttendance = () => {
   useEffect(() => {
     fetchClasses();
     fetchDivisions();
-    const today = new Date().toISOString().split('T')[0];
-    setSelectedDate(today);
+    setSelectedDate(new Date().toISOString().split('T')[0]);
+    setTodayDate(new Date().toISOString().split('T')[0]);
     fetchStudents();
   }, []);
 
   useEffect(() => {
     fetchStudents();
   }, [selectedClass, selectedDivision, fetchStudents]);
+
+  useEffect(() => {
+    if(selectedDate > todayDate) {
+      setEnableSubmit(false);
+      setSubmitLabel('Submit');
+    } else if (selectedDate < todayDate) {
+      setEnableSubmit(true);
+      setSubmitLabel('Edit');
+    } else {
+      setEnableSubmit(true);
+      setSubmitLabel('Submit');
+    }
+    console.log(enableSubmit);
+  }, [selectedDate]);
 
   const handleSubmit = (values: any) => {
     const attendanceData = students.map((student) => ({
@@ -81,6 +103,11 @@ const StudentAttendance = () => {
     const value = e.target.value;
     setSelectedDivision(value);
   };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setSelectedDate(value);
+  }
 
   return (
     <div className="student-list-container">
@@ -154,7 +181,10 @@ const StudentAttendance = () => {
                         name="date"
                         className="form-control"
                         value={values.date || selectedDate}
-                        onChange={(e) => setFieldValue('date', e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                          handleDateChange(e);
+                          setFieldValue('date', e.target.value);
+                        }}
                       />
                     </Col>
                   </Row>
@@ -193,8 +223,8 @@ const StudentAttendance = () => {
                     </tbody>
                   </Table>
 
-                  <Button className="float-right" type="submit">
-                    Submit
+                  <Button className="float-right" type="submit" disabled={!enableSubmit}>
+                    {submitLabel}
                   </Button>
                 </Form>
               )}
