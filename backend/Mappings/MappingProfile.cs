@@ -34,6 +34,9 @@ namespace backend.Mappings
 
             CreateMap<DivisionDTO, Division>();
             CreateMap<Division, DivisionDTO>();
+
+            CreateMap<AttendenceDTO, Attendence>();
+            CreateMap<Attendence, AttendenceDTO>();
         }
     }
 

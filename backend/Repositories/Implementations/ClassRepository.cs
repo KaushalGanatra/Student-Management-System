@@ -24,9 +24,8 @@ namespace backend.Repositories.Implementations
 
         public async Task<IEnumerable<ClassDTO>> ListAllClasses()
         {
-            var query = _context.Class.Where(s => s.DeletedAt == null);
+            var classes = await _context.Class.Where(s => s.DeletedAt == null).ToListAsync();
 
-            var classes = await query.ToListAsync();
             var classDtos = _mapper.Map<List<ClassDTO>>(classes);
             return classDtos;
         }
