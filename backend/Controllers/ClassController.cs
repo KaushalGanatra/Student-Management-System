@@ -48,5 +48,23 @@ namespace backend.Controllers
             }
             return Created(string.Empty, classObj);
         }
+
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> GetClassNumberById(string id)
+        //{
+        //    if (!Guid.TryParse(id, out var parsedId))
+        //    {
+        //        return BadRequest("The provided ID is not valid.");
+        //    }
+
+        //    var classNumber = await _classRepository.GetClassNumber(parsedId);
+
+        //    if (!(classNumber.HasValue))
+        //    {
+        //        return NotFound("Provided division id not found");
+        //    }
+
+        //    return Ok(classNumber);
+        //}
     }
 }

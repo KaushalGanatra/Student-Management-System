@@ -22,16 +22,16 @@ namespace backend.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<IEnumerable<StudentDTO>> ListAllStudents(int? sClass, string? sDivision)
+        public async Task<IEnumerable<StudentDTO>> ListAllStudents(string? sClassId, string? sDivisionId)
         {
             var query = _context.Students.Where(s => s.DeletedAt == null);
-            if(sClass.HasValue)
+            if(!string.IsNullOrEmpty(sClassId))
             {
-                query = query.Where(s => s.Class == sClass);
+                query = query.Where(s => s.ClassId.Equals(sClassId));
             }
-            if(!string.IsNullOrEmpty(sDivision))
+            if(!string.IsNullOrEmpty(sDivisionId))
             {
-                query = query.Where(s => s.Division.Equals(sDivision.ToUpper()));
+                query = query.Where(s => s.DivisionId.Equals(sDivisionId));
             }
 
             var students = await query.ToListAsync();
@@ -61,7 +61,7 @@ namespace backend.Repositories.Implementations
             }
 
             if (string.IsNullOrEmpty(studentDto.Name) ||
-                !studentDto.Class.HasValue ||
+                string.IsNullOrEmpty(studentDto.Class) ||
                 string.IsNullOrEmpty(studentDto.Division) ||
                 string.IsNullOrEmpty(studentDto.Gender))
             {
@@ -105,7 +105,7 @@ namespace backend.Repositories.Implementations
 
             //empty object
             if (string.IsNullOrEmpty(studentDto.Name) &&
-                !studentDto.Class.HasValue &&
+                string.IsNullOrEmpty(studentDto.Class) &&
                 string.IsNullOrEmpty(studentDto.Division) &&
                 string.IsNullOrEmpty(studentDto.Gender))
             {

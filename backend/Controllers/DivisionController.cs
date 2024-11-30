@@ -33,14 +33,14 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddClass(DivisionDTO divisionDto)
+        public async Task<IActionResult> AddDivision(DivisionDTO divisionDto)
         {
             if (divisionDto == null)
             {
                 return BadRequest("Provide ClassNumber");
             }
 
-            var divisionObj = await _divisionRepository.AddClass(divisionDto);
+            var divisionObj = await _divisionRepository.AddDivision(divisionDto);
 
             if (divisionObj == null)
             {
@@ -48,5 +48,23 @@ namespace backend.Controllers
             }
             return Created(string.Empty, divisionObj);
         }
+
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> GetDivisionNameById(string id)
+        //{
+        //    if (!Guid.TryParse(id, out var parsedId))
+        //    {
+        //        return BadRequest("The provided ID is not valid.");
+        //    }
+
+        //    var divisionName = await _divisionRepository.GetDivisionNameById(parsedId);
+
+        //    if (string.IsNullOrEmpty(divisionName))
+        //    {
+        //        return NotFound("Provided division id not found");
+        //    }
+
+        //    return Ok(divisionName);
+        //}
     }
 }

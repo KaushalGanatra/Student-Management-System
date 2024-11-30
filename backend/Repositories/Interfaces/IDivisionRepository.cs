@@ -7,6 +7,9 @@ namespace backend.Repositories.Interfaces
     {
         Task<IEnumerable<DivisionDTO>> ListAllDivisions();
 
-        Task<DivisionDTO> AddClass(DivisionDTO divisionObject);
+        Task<DivisionDTO> AddDivision(DivisionDTO divisionObject);
+
+        string? GetDivisionNameById(Guid id);
+
     }
 }

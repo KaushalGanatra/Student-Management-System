@@ -31,9 +31,10 @@ namespace backend.Repositories.Implementations
             return divisionDtos;
         }
 
-        public async Task<DivisionDTO> AddClass(DivisionDTO divisionDto)
+        public async Task<DivisionDTO> AddDivision(DivisionDTO divisionDto)
         {
             var divisionObj = _mapper.Map<Division>(divisionDto);
+            divisionObj.CreatedAt = DateTime.UtcNow;
             divisionObj.UpdatedAt = DateTime.UtcNow;
 
             _context.Division.Add(divisionObj);
@@ -43,5 +44,19 @@ namespace backend.Repositories.Implementations
 
             return createdDivisiontDto;
         }
+
+        public string? GetDivisionNameById(Guid id)
+        {
+            var divisionName = _context.Division.Where(d => d.DeletedAt == null && d.Id == id).Select(d => d.DivisionName).FirstOrDefault();
+
+
+            if (divisionName == null)
+            {
+                return null;
+            }
+
+            return divisionName;
+        }
+
     }
 }

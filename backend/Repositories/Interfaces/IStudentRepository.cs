@@ -5,7 +5,7 @@ namespace backend.Repositories.Interfaces
 {
     public interface IStudentRepository
     {
-        Task<IEnumerable<StudentDTO>> ListAllStudents(int? sClass, string? sDivision);
+        Task<IEnumerable<StudentDTO>> ListAllStudents(string? sClass, string? sDivision);
 
         Task<StudentDTO?> GetStudentById(Guid id);
 

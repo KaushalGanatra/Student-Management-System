@@ -34,6 +34,7 @@ namespace backend.Repositories.Implementations
         public async Task<ClassDTO> AddClass(ClassDTO classDto)
         {
             var classObj = _mapper.Map<Class>(classDto);
+            classObj.CreatedAt = DateTime.UtcNow;
             classObj.UpdatedAt = DateTime.UtcNow;
 
             _context.Class.Add(classObj);
@@ -42,6 +43,18 @@ namespace backend.Repositories.Implementations
             var createdClasstDto = _mapper.Map<ClassDTO>(classObj);
 
             return createdClasstDto;
+        }
+
+        public int? GetClassNumberById(Guid id)
+        {
+            var classNumber = _context.Class.Where(c => c.DeletedAt == null && c.Id == id).Select(c => c.ClassNumber).FirstOrDefault();
+
+            if (classNumber == 0)
+            {
+                return null;
+            }
+
+            return classNumber;
         }
     }
 }

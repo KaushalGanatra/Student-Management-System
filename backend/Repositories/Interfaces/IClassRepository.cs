@@ -8,5 +8,7 @@ namespace backend.Repositories.Interfaces
         Task<IEnumerable<ClassDTO>> ListAllClasses();
 
         Task<ClassDTO> AddClass(ClassDTO classObject);
+
+        int? GetClassNumberById(Guid id);
     }
 }
