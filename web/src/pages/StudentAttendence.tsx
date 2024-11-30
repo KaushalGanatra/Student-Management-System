@@ -19,33 +19,32 @@ const StudentAttendance = () => {
     const classUrl = `${baseUrl}/class`;
     const classResponse: AxiosResponse<Class[]> = await axios.get(classUrl);
     setClasses(classResponse.data);
-  },[]);
+  }, []);
 
   const fetchDivisions = useCallback(async () => {
     const divisionUrl = `${baseUrl}/division`;
     const divisionResponse: AxiosResponse<Division[]> = await axios.get(divisionUrl);
     setDivisions(divisionResponse.data);
-  },[]);
+  }, []);
 
   const fetchStudents = useCallback(async () => {
     try {
       let params = new URLSearchParams();
-      
+
       if (selectedClass) {
-        params.append('sClass', selectedClass);
+        params.append('sClassId', selectedClass);
       }
 
       if (selectedDivision) {
-        params.append('sDivision', selectedDivision);
+        params.append('sDivisionId', selectedDivision);
       }
 
       const studentUrl = `${baseUrl}/student?${params.toString()}`;
-      
       const response: AxiosResponse<Student[]> = await axios.get(studentUrl);
       setStudents(response.data);
     } catch (err) {
       console.error('Error fetching students:', err);
-      if(err.response.status == 404) {
+      if (err.response?.status === 404) {
         setStudents([]);
       }
     }
@@ -55,7 +54,7 @@ const StudentAttendance = () => {
     fetchClasses();
     fetchDivisions();
     const today = new Date().toISOString().split('T')[0];
-    setSelectedDate(today);  
+    setSelectedDate(today);
     fetchStudents();
   }, []);
 
@@ -112,39 +111,39 @@ const StudentAttendance = () => {
                 <Form>
                   <Row className="mb-3">
                     <Col sm={4}>
-                      <Field 
-                        as="select" 
-                        name="class" 
-                        className="form-control" 
+                      <Field
+                        as="select"
+                        name="class"
+                        className="form-control"
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                           handleClassChange(e);
-                          setFieldValue('class', e.target.value); 
-                        }} 
+                          setFieldValue('class', e.target.value);
+                        }}
                         value={values.class}
                       >
                         <option value="">Select Class</option>
-                        {classes.map((classes) => (
-                          <option key={classes.id} value={classes.classNumber}>
-                            {classes.classNumber}
+                        {classes.map((classItem) => (
+                          <option key={classItem.id} value={classItem.id}>
+                            {classItem.classNumber}
                           </option>
                         ))}
                       </Field>
                     </Col>
                     <Col sm={4}>
-                      <Field 
-                        as="select" 
-                        name="division" 
-                        className="form-control" 
-                        onChange={(e:React.ChangeEvent<HTMLSelectElement>) => {
+                      <Field
+                        as="select"
+                        name="division"
+                        className="form-control"
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                           handleDivisionChange(e);
                           setFieldValue('division', e.target.value);
-                        }} 
+                        }}
                         value={values.division}
                       >
                         <option value="">Select Division</option>
-                        {divisions.map((divisions) => (
-                          <option key={divisions.id} value={divisions.divisionName}>
-                            {divisions.divisionName}
+                        {divisions.map((division) => (
+                          <option key={division.id} value={division.id}>
+                            {division.divisionName}
                           </option>
                         ))}
                       </Field>
@@ -169,28 +168,28 @@ const StudentAttendance = () => {
                     </thead>
                     <tbody>
                       {students.length > 0 ? (
-                      students.map((student) => (
-                        <tr key={student.id}>
-                          <td>{student.name}</td>
-                          <td>
-                            <Field
-                              type="checkbox"
-                              name={`attendance-${student.id}`}
-                              checked={values[`attendance-${student.id}`]}
-                              onChange={(e) =>
-                                setFieldValue(`attendance-${student.id}`, e.target.checked)
-                              }
-                            />
+                        students.map((student) => (
+                          <tr key={student.id}>
+                            <td>{student.name}</td>
+                            <td>
+                              <Field
+                                type="checkbox"
+                                name={`attendance-${student.id}`}
+                                checked={values[`attendance-${student.id}`]}
+                                onChange={(e) =>
+                                  setFieldValue(`attendance-${student.id}`, e.target.checked)
+                                }
+                              />
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={2} className="text-center">
+                            No students found
                           </td>
                         </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={2} className="text-center">
-                          No students found
-                        </td>
-                      </tr>
-                    )}
+                      )}
                     </tbody>
                   </Table>
 

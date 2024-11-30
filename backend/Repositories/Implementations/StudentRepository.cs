@@ -25,19 +25,22 @@ namespace backend.Repositories.Implementations
         public async Task<IEnumerable<StudentDTO>> ListAllStudents(string? sClassId, string? sDivisionId)
         {
             var query = _context.Students.Where(s => s.DeletedAt == null);
-            if(!string.IsNullOrEmpty(sClassId))
+
+            if (!string.IsNullOrEmpty(sClassId) && Guid.TryParse(sClassId, out var classGuid))
             {
-                query = query.Where(s => s.ClassId.Equals(sClassId));
+                query = query.Where(s => s.ClassId == classGuid);
             }
-            if(!string.IsNullOrEmpty(sDivisionId))
+
+            if (!string.IsNullOrEmpty(sDivisionId) && Guid.TryParse(sDivisionId, out var divisionGuid))
             {
-                query = query.Where(s => s.DivisionId.Equals(sDivisionId));
+                query = query.Where(s => s.DivisionId == divisionGuid);
             }
 
             var students = await query.ToListAsync();
             var studentDtos = _mapper.Map<List<StudentDTO>>(students);
             return studentDtos;
         }
+
 
         public async Task<StudentDTO?> GetStudentById(Guid id)
         {
