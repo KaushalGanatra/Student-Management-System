@@ -1,4 +1,3 @@
-//Need to provide class and divisions in dropdown by calling the list api for them
 import '../stylesheets/App.css';
 import { useState, useEffect, useCallback } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';

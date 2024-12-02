@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
-import { Formik, Field, Form } from 'formik';
-import axios, { AxiosResponse } from 'axios';
+import { Formik, Field, Form, FormikHelpers } from 'formik';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Student, Class, Division, AttendenceData } from '../structures/Types';
 import { Table, Button, Card, Row, Col, Badge } from 'react-bootstrap';
 import '../stylesheets/App.css';
@@ -32,15 +32,10 @@ const StudentAttendance = () => {
     setDivisions(divisionResponse.data);
   }, []);
 
-  // const fetchAttendenceData = useCallback(async () => {
-  //     const attendenceUrl = `${baseUrl}/attendence?attendenceDate=`+selectedDate;
-  //     const attendenceReponse: AxiosResponse<AttendenceData[]> = await axios.get(attendenceUrl)
-    // }, [selectedDate]);
-
-    const addAttendence = useCallback(async (attendanceData: AttendenceData[]) => {
-        const attendenceUrl = `${baseUrl}/attendance`;
-        await axios.post(attendenceUrl, attendanceData);
-    }, []);
+  const addAttendence = useCallback(async (attendanceData: AttendenceData[]) => {
+    const attendenceUrl = `${baseUrl}/attendance`;
+    await axios.post(attendenceUrl, attendanceData);
+  }, []);
 
   const fetchStudents = useCallback(async () => {
     try {
@@ -59,7 +54,8 @@ const StudentAttendance = () => {
       setStudents(response.data);
     } catch (err) {
       console.error('Error fetching students:', err);
-      if (err.response?.status === 404) {
+
+      if ((err as AxiosError).response?.status === 404) {
         setStudents([]);
       }
     }
@@ -78,10 +74,10 @@ const StudentAttendance = () => {
   }, [selectedClass, selectedDivision, fetchStudents]);
 
   useEffect(() => {
-    if(selectedDate > todayDate) {
+    if (selectedDate > todayDate) {
       setEnableSubmit(false);
-      setSubmitLabel('Submit');      
-      setBadgeColor('info'); 
+      setSubmitLabel('Submit');
+      setBadgeColor('info');
       setAttendanceStatus('Cannot fill in advance');
     } else if (selectedDate < todayDate) {
       setEnableSubmit(true);
@@ -91,22 +87,22 @@ const StudentAttendance = () => {
     } else {
       setEnableSubmit(true);
       setSubmitLabel('Submit');
-      setBadgeColor('warning'); 
+      setBadgeColor('warning');
       setAttendanceStatus('Pending');
     }
     console.log(enableSubmit);
   }, [selectedDate]);
 
-    const handleSubmit = (values: AttendenceData) => {
+  const handleSubmit = (values: AttendenceData, { setSubmitting }: FormikHelpers<AttendenceData>) => {
     const attendanceData = students.map((student) => ({
       studentId: student.id,
       attendenceDate: values.date || selectedDate,
       isPresent: values[`attendance-${student.id}`] || false,
     }));
 
-
     console.log('Attendance data:', attendanceData);
     addAttendence(attendanceData);
+    setSubmitting(false);
   };
 
   const handleClassChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -122,7 +118,13 @@ const StudentAttendance = () => {
   const handleDateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelectedDate(value);
-  }
+  };
+
+  const handleRowClick = (studentId: string, setFieldValue: Function) => {
+    const currentValue = students.find((student) => student.id === studentId);
+    const fieldName = `attendance-${studentId}`;
+    setFieldValue(fieldName, !currentValue?.attendanceStatus);
+  };
 
   return (
     <div className="student-list-container">
@@ -205,13 +207,10 @@ const StudentAttendance = () => {
                   </Row>
 
                   <h3>
-                  <Badge 
-                    bg={badgeColor}  
-                    pill          
-                  >
-                    {attendanceStatus}
-                  </Badge>
-                </h3>
+                    <Badge bg={badgeColor} pill>
+                      {attendanceStatus}
+                    </Badge>
+                  </h3>
 
                   <Table striped bordered hover className="student-table">
                     <thead>
@@ -223,7 +222,7 @@ const StudentAttendance = () => {
                     <tbody>
                       {students.length > 0 ? (
                         students.map((student) => (
-                          <tr key={student.id}>
+                          <tr key={student.id} onClick={() => handleRowClick(student.id, setFieldValue)}>
                             <td>{student.name}</td>
                             <td>
                               <Field
