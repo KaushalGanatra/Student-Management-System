@@ -19,6 +19,7 @@ const StudentAttendance = () => {
   const [submitLabel, setSubmitLabel] = useState<string>('Submit');
   const [attendanceStatus, setAttendanceStatus] = useState<string>('Pending');
   const [badgeColor, setBadgeColor] = useState<string>('primary');
+  const [attendanceByDate, setAttendanceByDate] = useState<AttendenceData[]>([]);
 
   const fetchClasses = useCallback(async () => {
     const classUrl = `${baseUrl}/class`;
@@ -30,6 +31,13 @@ const StudentAttendance = () => {
     const divisionUrl = `${baseUrl}/division`;
     const divisionResponse: AxiosResponse<Division[]> = await axios.get(divisionUrl);
     setDivisions(divisionResponse.data);
+  }, []);
+
+  const fetchAttendance = useCallback(async (date: string) => {
+    const attendanceUrl = `${baseUrl}/attendance?attendenceDate=` + date;
+    const attendanceResponse: AxiosResponse<AttendenceData[]> = await axios.get(attendanceUrl);
+    setAttendanceByDate(attendanceResponse.data);
+    console.log("Attendance By Date: ", attendanceResponse.data);
   }, []);
 
   const addAttendence = useCallback(async (attendanceData: AttendenceData[]) => {
@@ -80,6 +88,7 @@ const StudentAttendance = () => {
       setBadgeColor('info');
       setAttendanceStatus('Cannot fill in advance');
     } else if (selectedDate < todayDate) {
+      fetchAttendance(selectedDate);
       setEnableSubmit(true);
       setSubmitLabel('Edit');
       setBadgeColor('success');
@@ -140,12 +149,14 @@ const StudentAttendance = () => {
           </Card.Header>
           <Card.Body>
             <Formik
+              enableReinitialize={true} 
               initialValues={{
                 class: selectedClass,
                 division: selectedDivision,
                 date: selectedDate,
                 ...students.reduce((acc, student) => {
-                  acc[`attendance-${student.id}`] = false;
+                  const attendance = attendanceByDate.find((attendanceData) => attendanceData.studentId === student.id);
+                  acc[`attendance-${student.id}`] = attendance ? attendance.isPresent : false;
                   return acc;
                 }, {} as Record<string, boolean>),
               }}
