@@ -8,9 +8,26 @@ export type Student = {
     gender: string;
 };
 
+export type Class = {
+    id: string;
+    classNumber: number;
+}
+
+export type Division = {
+    id: string;
+    divisionName: string;
+}
+
+export type AttendenceData = {
+    id: string;
+    attendenceDate: Date;
+    studentId: string;
+    isPresent: boolean;
+}
+
 export const validationSchema = Yup.object({
     name: Yup.string().required('Name is required'),
-    class: Yup.number().required('Class is required').min(1, 'Class must be a positive number').max(12, 'Class number must be lower than 12'),
+    class: Yup.string().required('Class is required'),
     division: Yup.string().required('Division is required'),
     gender: Yup.string().required('Gender is required'),
   });

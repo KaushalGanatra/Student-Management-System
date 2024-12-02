@@ -18,10 +18,6 @@ namespace backend.Models
 
         public required string Name { get; set; }
 
-        public required int Class { get; set; }
-
-        public required string Division { get; set; }
-
         public required Gender Gender { get; set; }
 
         public required DateTime CreatedAt { get; set; }
@@ -29,6 +25,10 @@ namespace backend.Models
         public required DateTime UpdatedAt { get; set; }
 
         public DateTime? DeletedAt { get; set; }
+        
+        public Guid ClassId { get; set; }
+
+        public Guid DivisionId { get; set; }
 
         public Student()
         {

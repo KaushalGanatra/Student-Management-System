@@ -24,7 +24,7 @@ namespace backend
             {
                 options.AddPolicy("AllowFrontend", builder =>
                 {
-                    builder.WithOrigins("http://localhost:5173")
+                    builder.WithOrigins("http://localhost:5174")
                            .AllowAnyMethod()
                            .AllowAnyHeader()
                            .AllowCredentials();
@@ -33,8 +33,12 @@ namespace backend
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddValidatorsFromAssemblyContaining<StudentValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<ClassValidator>();
 
             builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+            builder.Services.AddScoped<IClassRepository, ClassRepository>();
+            builder.Services.AddScoped<IDivisionRepository, DivisionRepository>();
+            builder.Services.AddScoped<IAttendenceRepository, AttendenceRepository>();
 
             var app = builder.Build();
 
