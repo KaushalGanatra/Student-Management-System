@@ -32,18 +32,23 @@ namespace backend.Repositories.Implementations
             return attendenceDtos;
         }
 
-        public async Task<AttendenceDTO> AddAttendenceData(AttendenceDTO attendenceDto)
+        public async Task<IEnumerable<AttendenceDTO>> AddAttendenceData(IEnumerable<AttendenceDTO> attendenceDtos)
         {
-            var attendenceObj = _mapper.Map<Attendence>(attendenceDto);
-            attendenceObj.CreatedAt = DateTime.UtcNow;
-            attendenceObj.UpdatedAt = DateTime.UtcNow;
+            var attendences = _mapper.Map<IEnumerable<Attendence>>(attendenceDtos);
+            Console.WriteLine(attendences);
 
-            _context.Attendences.Add(attendenceObj);
+            foreach (var attendence in attendences)
+            {
+                attendence.CreatedAt = DateTime.UtcNow;
+                attendence.UpdatedAt = DateTime.UtcNow;
+            }
+
+            _context.Attendences.AddRange(attendences);
             await _context.SaveChangesAsync();
 
-            var createdAttendencetDto = _mapper.Map<AttendenceDTO>(attendenceObj);
+            var createdAttendencetDtos = _mapper.Map<IEnumerable<AttendenceDTO>>(attendences);
 
-            return createdAttendencetDto;
+            return createdAttendencetDtos;
         }
     }
 }

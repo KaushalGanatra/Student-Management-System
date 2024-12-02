@@ -7,6 +7,6 @@ namespace backend.Repositories.Interfaces
     {
         Task<IEnumerable<AttendenceDTO>> ListAttendenceByDate(DateOnly attendenceDate);
 
-        Task<AttendenceDTO> AddAttendenceData(AttendenceDTO attendenceObject);
+        Task<IEnumerable<AttendenceDTO>> AddAttendenceData(IEnumerable<AttendenceDTO> attendenceObject);
     }
 }

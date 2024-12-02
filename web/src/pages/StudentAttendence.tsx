@@ -33,7 +33,12 @@ const StudentAttendance = () => {
   // const fetchAttendenceData = useCallback(async () => {
   //     const attendenceUrl = `${baseUrl}/attendence?attendenceDate=`+selectedDate;
   //     const attendenceReponse: AxiosResponse<AttendenceData[]> = await axios.get(attendenceUrl)
-  // }, [selectedDate]);
+    // }, [selectedDate]);
+
+    const addAttendence = useCallback(async (attendanceData: AttendenceData[]) => {
+        const attendenceUrl = `${baseUrl}/attendance`;
+        await axios.post(attendenceUrl, attendanceData);
+    }, []);
 
   const fetchStudents = useCallback(async () => {
     try {
@@ -84,14 +89,16 @@ const StudentAttendance = () => {
     console.log(enableSubmit);
   }, [selectedDate]);
 
-  const handleSubmit = (values: any) => {
+    const handleSubmit = (values: AttendenceData) => {
     const attendanceData = students.map((student) => ({
       studentId: student.id,
-      date: values.date || selectedDate,
+      attendenceDate: values.date || selectedDate,
       isPresent: values[`attendance-${student.id}`] || false,
     }));
 
+
     console.log('Attendance data:', attendanceData);
+    addAttendence(attendanceData);
   };
 
   const handleClassChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

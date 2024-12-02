@@ -11,7 +11,7 @@ using backend.Repositories.Implementations;
 
 namespace backend.Controllers
 {
-    [Route("api/attendece")]
+    [Route("api/attendance")]
     [ApiController]
     public class AttendenceController : ControllerBase
     {
@@ -38,20 +38,20 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAttendenceData(AttendenceDTO attendenceDto)
+        public async Task<IActionResult> AddAttendenceData(IEnumerable<AttendenceDTO> attendenceDtos)
         {
-            if (attendenceDto == null)
+            if (attendenceDtos == null)
             {
                 return BadRequest("Provide Proper attendence data");
             }
 
-            var attendenceObj = await _attendenceRepository.AddAttendenceData(attendenceDto);
+            var attendenceObjs = await _attendenceRepository.AddAttendenceData(attendenceDtos);
 
-            if (attendenceObj == null)
+            if (attendenceObjs == null)
             {
                 return BadRequest("Error while adding attendence data");
             }
-            return Created(string.Empty, attendenceObj);
+            return Created(string.Empty, attendenceObjs);
         }
     }
 }
