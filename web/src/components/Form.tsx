@@ -1,10 +1,11 @@
+//Need to provide class and divisions in dropdown by calling the list api for them
 import '../stylesheets/App.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { Button, Form as BootstrapForm, Row, Col, Alert, Spinner, Container, Card } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Student, validationSchema } from '../structures/Types';  
+import axios, {AxiosResponse} from 'axios';
+import { Student, validationSchema, Class, Division } from '../structures/Types';  
 
 const StudentForm = () => {
   const { id } = useParams<{ id?: string }>();
@@ -20,10 +21,28 @@ const StudentForm = () => {
   const [success, setSuccess] = useState<string>('');
 
   useEffect(() => {
+    fetchClasses();
+    fetchDivisions();
     if (id) {
       fetchStudentData(id);
     }
   }, [id]);
+
+  const baseUrl = 'http://localhost:5027/api';
+  const [classes, setClasses] = useState<Class[]>([]);
+  const [divisions, setDivisions] = useState<Division[]>([]);
+
+  const fetchClasses = useCallback(async () => {
+    const classUrl = `${baseUrl}/class`;
+    const classResponse: AxiosResponse<Class[]> = await axios.get(classUrl);
+    setClasses(classResponse.data);
+  }, []);
+
+  const fetchDivisions = useCallback(async () => {
+    const divisionUrl = `${baseUrl}/division`;
+    const divisionResponse: AxiosResponse<Division[]> = await axios.get(divisionUrl);
+    setDivisions(divisionResponse.data);
+  }, []);
 
   const fetchStudentData = async (studentId: string) => {
     setLoading(true);
@@ -92,12 +111,18 @@ const StudentForm = () => {
                   <BootstrapForm.Group>
                     <BootstrapForm.Label>Class</BootstrapForm.Label>
                     <Field
-                      type="number"
+                      as="select"
                       name="class"
                       id="class"
                       className={`form-control ${touched.class && errors.class ? 'is-invalid' : ''}`}
-                      placeholder="Class"
-                    />
+                    >
+                      <option value="">Select Class...</option>
+                      {classes.map((classItem) => (
+                        <option key={classItem.id} value={classItem.id}>
+                          {classItem.classNumber}
+                        </option>
+                      ))}
+                    </Field>
                     <ErrorMessage name="class" component="div" className="invalid-feedback" />
                   </BootstrapForm.Group>
                 </Col>
@@ -111,10 +136,12 @@ const StudentForm = () => {
                       id="division"
                       className={`form-control ${touched.division && errors.division ? 'is-invalid' : ''}`}
                     >
-                      <option value="">Select...</option>
-                      <option value="A">A</option>
-                      <option value="B">B</option>
-                      <option value="C">C</option>
+                      <option value="">Select Division...</option>
+                      {divisions.map((division) => (
+                        <option key={division.id} value={division.id}>
+                          {division.divisionName}
+                        </option>
+                      ))}
                     </Field>
                     <ErrorMessage name="division" component="div" className="invalid-feedback" />
                   </BootstrapForm.Group>

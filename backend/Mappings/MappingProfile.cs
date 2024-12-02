@@ -22,12 +22,12 @@ namespace backend.Mappings
             // Mapping from StudentDTO to Student (for PUT, PATCH, etc.)
             CreateMap<StudentDTO, Student>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.Name, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Name)))  // Update only if not null or empty
-                .ForMember(dest => dest.ClassId, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Class)))
-                .ForMember(dest => dest.DivisionId, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Division)))
+                .ForMember(dest => dest.Name, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Name)))
+                .ForMember(dest => dest.ClassId, opt => opt.MapFrom<ClassStringToGuidResolver>())
+                .ForMember(dest => dest.DivisionId, opt => opt.MapFrom<DivisionStringToGuidResolver>())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
-                .ForMember(dest => dest.Gender, opt => opt.MapFrom<GenderResolver>()); // Use custom resolver for Gender
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom<GenderResolver>());
 
             CreateMap<ClassDTO, Class>();
             CreateMap<Class, ClassDTO>();
@@ -37,6 +37,22 @@ namespace backend.Mappings
 
             CreateMap<AttendenceDTO, Attendence>();
             CreateMap<Attendence, AttendenceDTO>();
+        }
+    }
+
+    public class ClassStringToGuidResolver : IValueResolver<StudentDTO, Student, Guid>
+    {
+        public Guid Resolve(StudentDTO source, Student destination, Guid destMember, ResolutionContext context)
+        {
+            return Guid.TryParse(source.Class, out var classId) ? classId : Guid.Empty;
+        }
+    }
+
+    public class DivisionStringToGuidResolver : IValueResolver<StudentDTO, Student, Guid>
+    {
+        public Guid Resolve(StudentDTO source, Student destination, Guid destMember, ResolutionContext context)
+        {
+            return Guid.TryParse(source.Division, out var divisionId) ? divisionId : Guid.Empty;
         }
     }
 
@@ -91,6 +107,6 @@ namespace backend.Mappings
             }
 
             return Gender.Undefined;
-        }
+        }  
     }
 }
