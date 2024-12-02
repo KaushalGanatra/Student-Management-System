@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Formik, Field, Form } from 'formik';
 import axios, { AxiosResponse } from 'axios';
 import { Student, Class, Division, AttendenceData } from '../structures/Types';
-import { Table, Button, Card, Row, Col } from 'react-bootstrap';
+import { Table, Button, Card, Row, Col, Badge } from 'react-bootstrap';
 import '../stylesheets/App.css';
 
 const StudentAttendance = () => {
@@ -17,6 +17,8 @@ const StudentAttendance = () => {
   const [todayDate, setTodayDate] = useState<string>('');
   const [enableSubmit, setEnableSubmit] = useState<boolean>(true);
   const [submitLabel, setSubmitLabel] = useState<string>('Submit');
+  const [attendanceStatus, setAttendanceStatus] = useState<string>('Pending');
+  const [badgeColor, setBadgeColor] = useState<string>('primary');
 
   const fetchClasses = useCallback(async () => {
     const classUrl = `${baseUrl}/class`;
@@ -78,13 +80,19 @@ const StudentAttendance = () => {
   useEffect(() => {
     if(selectedDate > todayDate) {
       setEnableSubmit(false);
-      setSubmitLabel('Submit');
+      setSubmitLabel('Submit');      
+      setBadgeColor('info'); 
+      setAttendanceStatus('Cannot fill in advance');
     } else if (selectedDate < todayDate) {
       setEnableSubmit(true);
       setSubmitLabel('Edit');
+      setBadgeColor('success');
+      setAttendanceStatus('Filled');
     } else {
       setEnableSubmit(true);
       setSubmitLabel('Submit');
+      setBadgeColor('warning'); 
+      setAttendanceStatus('Pending');
     }
     console.log(enableSubmit);
   }, [selectedDate]);
@@ -195,6 +203,15 @@ const StudentAttendance = () => {
                       />
                     </Col>
                   </Row>
+
+                  <h3>
+                  <Badge 
+                    bg={badgeColor}  
+                    pill          
+                  >
+                    {attendanceStatus}
+                  </Badge>
+                </h3>
 
                   <Table striped bordered hover className="student-table">
                     <thead>
