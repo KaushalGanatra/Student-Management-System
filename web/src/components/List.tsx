@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Button, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { ListProps } from '../structures/Types';
-import ConfirmationModal from '../components/ConfirmationModal'; 
+import ConfirmationModal from '../components/ConfirmationModal';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const List: React.FC<ListProps> = ({
@@ -67,6 +67,9 @@ const List: React.FC<ListProps> = ({
         studentToDelete={studentToDelete}
         handleClose={handleClose}
         handleDelete={handleDelete}
+        handleSubmission={handleDelete}
+        message="Are you sure you want to delete this student?"
+        actionLabel="Delete"
       />
     </div>
   );

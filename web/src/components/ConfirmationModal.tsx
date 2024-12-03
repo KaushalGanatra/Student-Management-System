@@ -1,29 +1,27 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import { DeleteConfirmationModalProps } from '../structures/Types';
+import { ConfirmationModalProps } from '../structures/Types';
 
-const ConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
+const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   show,
   studentToDelete,
   handleClose,
   handleDelete,
+  handleSubmission,
+  message,
+  actionLabel
 }) => {
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>Are you sure?</Modal.Title>
+        <Modal.Title>{actionLabel}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {studentToDelete && (
-          <>
-            Are you sure you want to delete {studentToDelete.name}'s data
-            (Class: {studentToDelete.class} - {studentToDelete.division})?
-          </>
-        )}
+        {message}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
-          No, don't delete it
+          No, don't {actionLabel}
         </Button>
         <Button
           variant="primary"
@@ -31,10 +29,12 @@ const ConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
             if (studentToDelete && studentToDelete.id !== undefined) {
               handleDelete(studentToDelete.id);
               handleClose();
+            } else {
+              handleSubmission();
             }
           }}
         >
-          Yes, delete it
+          Yes, {actionLabel}
         </Button>
       </Modal.Footer>
     </Modal>

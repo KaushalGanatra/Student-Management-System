@@ -43,9 +43,12 @@ export interface ListProps {
     studentToDelete: Student | null;
   }
 
- export interface DeleteConfirmationModalProps {
+  export interface ConfirmationModalProps {
     show: boolean;
-    studentToDelete: Student | null;
+    studentToDelete: any; 
     handleClose: () => void;
     handleDelete: (id: string) => void;
+    handleSubmission: () => void;
+    message: string; 
+    actionLabel: string; 
   }

@@ -1,15 +1,15 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { Formik, Field, Form, FormikHelpers } from 'formik';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosResponse, AxiosError } from 'axios';
 import { Student, Class, Division, AttendenceData } from '../structures/Types';
 import { Table, Button, Card, Row, Col, Badge, Spinner } from 'react-bootstrap';
 import '../stylesheets/App.css';
 import { fetchClasses, fetchDivisions, baseUrl } from '../utils/api';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const StudentAttendance = () => {
   const [attendanceByDate, setAttendanceByDate] = useState<AttendenceData[]>([]);
-
   const [students, setStudents] = useState<Student[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>('');
@@ -18,49 +18,30 @@ const StudentAttendance = () => {
   const [todayDate, setTodayDate] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<string>('');
 
-  const [enableSubmit, setEnableSubmit] = useState<boolean>(true);
   const [submitLabel, setSubmitLabel] = useState<string>('Submit');
-  
   const [badgeColor, setBadgeColor] = useState<string>('primary');
   const [attendanceStatus, setAttendanceStatus] = useState<string>('');
-
   const [loading, setLoading] = useState<boolean>(false);
+
+  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [attendanceToSubmit, setAttendanceToSubmit] = useState<AttendenceData[] | null>(null);
 
   const fetchStudents = useCallback(async () => {
     try {
       let params = new URLSearchParams();
-
-      if (selectedClass) {
-        params.append('sClassId', selectedClass);
-      }
-
-      if (selectedDivision) {
-        params.append('sDivisionId', selectedDivision);
-      }
+      if (selectedClass) params.append('sClassId', selectedClass);
+      if (selectedDivision) params.append('sDivisionId', selectedDivision);
 
       const studentUrl = `${baseUrl}/student?${params.toString()}`;
       const response: AxiosResponse<Student[]> = await axios.get(studentUrl);
       setStudents(response.data);
     } catch (err) {
       console.error('Error fetching students:', err);
-
       if ((err as AxiosError).response?.status === 404) {
         setStudents([]);
       }
     }
   }, [selectedClass, selectedDivision]);
-
-  useEffect(() => {
-    fetchClasses().then(classResponse => {
-      setClasses(classResponse);
-    });
-    fetchDivisions().then(divisionResponse => {
-      setDivisions(divisionResponse);
-    });
-    setSelectedDate(new Date().toISOString().split('T')[0]);
-    setTodayDate(new Date().toISOString().split('T')[0]);
-    fetchStudents();
-  }, []);
 
   const fetchAttendance = useCallback(async (date: string) => {
     setLoading(true);
@@ -74,60 +55,21 @@ const StudentAttendance = () => {
     setLoading(false);
   }, []);
 
-  const addAttendence = useCallback(async (attendanceData: AttendenceData[]) => {
+  const submitAttendance = async (attendanceData: AttendenceData[]) => {
     setLoading(true);
-    const attendenceUrl = `${baseUrl}/attendance`;
-    await axios.post(attendenceUrl, attendanceData);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    fetchStudents();
-  }, [selectedClass, selectedDivision, fetchStudents]);
-
-  useEffect(() => {
-    setAttendanceByDate([]); 
-  
-    if (selectedDate > todayDate) {
-      console.log("Future date");
-      setEnableSubmit(false);
-      setSubmitLabel('Submit');
-      setBadgeColor('info');
-      setAttendanceStatus('Cannot fill in advance');
-    } else if (selectedDate < todayDate) {
-      console.log("Past date");
-      fetchAttendance(selectedDate); 
-      setEnableSubmit(true);  
-    } else {
-      console.log("Current date");
-      fetchAttendance(selectedDate); 
-      setEnableSubmit(true);
+    try {
+      const attendenceUrl = `${baseUrl}/attendance`;
+      await axios.post(attendenceUrl, attendanceData);
+      setLoading(false);
+      setShowConfirmation(false);
+      setSubmitLabel('Submitted');
+      setAttendanceStatus('Filled');
+      setBadgeColor('success');
+    } catch (err) {
+      console.error('Error submitting attendance:', err);
+      setLoading(false);
     }
-  }, [selectedDate]);
-
-  useEffect(() => {
-    if (selectedDate < todayDate) {  
-      if (attendanceByDate.length === 0) {
-        setSubmitLabel('Submit');
-        setAttendanceStatus('Not filled');
-        setBadgeColor('warning');
-      } else {
-        setSubmitLabel('Edit');
-        setAttendanceStatus('Filled');
-        setBadgeColor('success');
-      }
-    } else if (selectedDate == todayDate) {
-      if(attendanceByDate.length !== 0) {
-        setSubmitLabel('Edit');
-        setAttendanceStatus('Filled');
-        setBadgeColor('success');
-      } else {
-        setSubmitLabel('Submit');
-        setAttendanceStatus('Pending');
-        setBadgeColor('warning');
-      }
-    }
-  }, [attendanceByDate, selectedDate]);
+  };
 
   const handleSubmit = (values: AttendenceData, { setSubmitting }: FormikHelpers<AttendenceData>) => {
     const attendanceData = students.map((student) => ({
@@ -136,25 +78,51 @@ const StudentAttendance = () => {
       isPresent: values[`attendance-${student.id}`] || false,
     }));
 
-    addAttendence(attendanceData);
+    setAttendanceToSubmit(attendanceData);
+    setShowConfirmation(true); 
     setSubmitting(false);
   };
-  
 
-  const handleClassChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    setSelectedClass(value);
+  const handleCloseConfirmation = () => {
+    setShowConfirmation(false);
   };
 
-  const handleDivisionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    setSelectedDivision(value);
+  const handleConfirmSubmission = async () => {
+    if (attendanceToSubmit) {
+      await submitAttendance(attendanceToSubmit);
+    }
   };
 
-  const handleDateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    setSelectedDate(value);
-  };
+  useEffect(() => {
+    fetchClasses().then(classResponse => setClasses(classResponse));
+    fetchDivisions().then(divisionResponse => setDivisions(divisionResponse));
+    setSelectedDate(new Date().toISOString().split('T')[0]);
+    setTodayDate(new Date().toISOString().split('T')[0]);
+  }, []);
+
+  useEffect(() => {
+    fetchStudents(); 
+  }, [selectedClass, selectedDivision, fetchStudents]);
+
+  useEffect(() => {
+    fetchAttendance(selectedDate);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (selectedDate > todayDate) {
+      setSubmitLabel('Submit');
+      setAttendanceStatus('Cannot submit in advance');
+      setBadgeColor('info');
+    } else if (attendanceByDate.length === 0) {
+      setSubmitLabel('Submit');
+      setAttendanceStatus('Not filled');
+      setBadgeColor('warning');
+    } else {
+      setSubmitLabel('Submitted');
+      setAttendanceStatus('Filled');
+      setBadgeColor('success');
+    }
+  }, [attendanceByDate, selectedDate, todayDate]);
 
   const handleRowClick = (studentId: string, setFieldValue: Function) => {
     const currentValue = students.find((student) => student.id === studentId);
@@ -176,7 +144,7 @@ const StudentAttendance = () => {
           </Card.Header>
           <Card.Body>
             <Formik
-              enableReinitialize={true} 
+              enableReinitialize={true}
               initialValues={{
                 class: selectedClass,
                 division: selectedDivision,
@@ -197,14 +165,14 @@ const StudentAttendance = () => {
                         as="select"
                         name="class"
                         className="form-control"
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                          handleClassChange(e);
+                        onChange={e => {
+                          setSelectedClass(e.target.value);
                           setFieldValue('class', e.target.value);
                         }}
                         value={values.class}
                       >
                         <option value="">Select Class</option>
-                        {classes.map((classItem) => (
+                        {classes.length > 0 && classes.map((classItem) => (
                           <option key={classItem.id} value={classItem.id}>
                             {classItem.classNumber}
                           </option>
@@ -216,14 +184,14 @@ const StudentAttendance = () => {
                         as="select"
                         name="division"
                         className="form-control"
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                          handleDivisionChange(e);
+                        onChange={e => {
+                          setSelectedDivision(e.target.value);
                           setFieldValue('division', e.target.value);
                         }}
                         value={values.division}
                       >
                         <option value="">Select Division</option>
-                        {divisions.map((division) => (
+                        {divisions.length > 0 && divisions.map((division) => (
                           <option key={division.id} value={division.id}>
                             {division.divisionName}
                           </option>
@@ -235,70 +203,77 @@ const StudentAttendance = () => {
                         type="date"
                         name="date"
                         className="form-control"
-                        value={values.date || selectedDate}
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                          handleDateChange(e);
+                        value={selectedDate}
+                        onChange={e => {
+                          setSelectedDate(e.target.value);
                           setFieldValue('date', e.target.value);
                         }}
                       />
                     </Col>
                   </Row>
 
-                  <h3>
-                    <Badge bg={badgeColor} pill>
-                      {attendanceStatus}
-                    </Badge>
-                  </h3>
-
-                  {loading ? (
-                    <div className="d-flex justify-content-center">
-                      <Spinner animation="border" variant="primary" />
-                    </div>
-                  ) : (
-                    <Table striped bordered hover className="student-table">
-                      <thead>
-                        <tr>
-                          <th>Name</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {students.length > 0 ? (
-                          students.map((student) => (
-                            <tr key={student.id} onClick={() => handleRowClick(student.id, setFieldValue)}>
-                              <td>{student.name}</td>
-                              <td>
-                                <Field
-                                  type="checkbox"
-                                  name={`attendance-${student.id}`}
-                                  checked={values[`attendance-${student.id}`]}
-                                  onChange={(e) =>
-                                    setFieldValue(`attendance-${student.id}`, e.target.checked)
-                                  }
-                                />
-                              </td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan={2} className="text-center">
-                              No students found
+                  <Table bordered responsive>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {students.length > 0 ? (
+                        students.map((student) => (
+                          <tr key={student.id} onClick={() => handleRowClick(student.id, setFieldValue)}>
+                            <td>{student.name}</td>
+                            <td>
+                              <Field
+                                type="checkbox"
+                                name={`attendance-${student.id}`}
+                                checked={values[`attendance-${student.id}`]}
+                                onChange={e => setFieldValue(`attendance-${student.id}`, e.target.checked)}
+                              />
                             </td>
                           </tr>
-                        )}
-                      </tbody>
-                    </Table>
-                  )}
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={2} className="text-center">
+                            No students found
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </Table>
 
-                  <Button className="float-right" type="submit" disabled={!enableSubmit}>
-                    {submitLabel}
-                  </Button>
+                  <div className="d-flex justify-content-end">
+                    {submitLabel === 'Submit' && selectedDate <= todayDate && (
+                      <Button
+                        variant="success"
+                        type="submit"
+                        disabled={loading || selectedDate > todayDate}
+                      >
+                        {loading ? <Spinner animation="border" size="sm" /> : submitLabel}
+                      </Button>
+                    )}
+                    {submitLabel === 'Submitted' && (
+                      <Badge bg={badgeColor}>{attendanceStatus}</Badge>
+                    )}
+                  </div>
                 </Form>
               )}
             </Formik>
           </Card.Body>
         </Card>
       </div>
+
+      <ConfirmationModal
+        show={showConfirmation}
+        studentToDelete={null}
+        handleClose={handleCloseConfirmation}
+        handleDelete={handleConfirmSubmission}
+        handleSubmission={handleConfirmSubmission}
+        message="Are you sure you want to mark attendance for this student?"
+        actionLabel="Confirm Attendance"
+      />
     </div>
   );
 };
