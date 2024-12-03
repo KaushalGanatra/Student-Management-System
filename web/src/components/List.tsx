@@ -1,18 +1,9 @@
-import { Table, Button, Spinner, Modal } from 'react-bootstrap';
+import React from 'react';
+import { Table, Button, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { Student } from '../structures/Types';
+import { ListProps } from '../structures/Types';
+import ConfirmationModal from '../components/ConfirmationModal'; 
 import 'bootstrap-icons/font/bootstrap-icons.css';
-
-interface ListProps {
-  students: Student[];
-  filteredStudents: Student[];
-  loading: boolean;
-  handleOpen: (student: Student) => void;
-  handleDelete: (id: string) => void;
-  showConformation: boolean;
-  handleClose: () => void;
-  studentToDelete: Student | null;
-}
 
 const List: React.FC<ListProps> = ({
   filteredStudents,
@@ -71,35 +62,12 @@ const List: React.FC<ListProps> = ({
         </Table>
       )}
 
-      <Modal show={showConformation} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Are you sure?</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {studentToDelete && (
-            <>
-              Are you sure you want to delete {studentToDelete.name}'s data
-              (Class: {studentToDelete.class} - {studentToDelete.division})?
-            </>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            No, don't delete it
-          </Button>
-          <Button
-            variant="primary"
-            onClick={() => {
-              if (studentToDelete && studentToDelete.id !== undefined) {
-                handleDelete(studentToDelete.id);
-                handleClose();
-              }
-            }}
-          >
-            Yes, delete it
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ConfirmationModal
+        show={showConformation}
+        studentToDelete={studentToDelete}
+        handleClose={handleClose}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 };

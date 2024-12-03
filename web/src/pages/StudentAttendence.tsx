@@ -83,18 +83,29 @@ const StudentAttendance = () => {
   }, [selectedClass, selectedDivision, fetchStudents]);
 
   useEffect(() => {
+    setAttendanceByDate([]);
     if (selectedDate > todayDate) {
+      console.log("Future date");
       setEnableSubmit(false);
       setSubmitLabel('Submit');
       setBadgeColor('info');
       setAttendanceStatus('Cannot fill in advance');
     } else if (selectedDate < todayDate) {
+      console.log("Old date");
       fetchAttendance(selectedDate);
+      console.log("Length: "+attendanceByDate.length);
       setEnableSubmit(true);
-      setSubmitLabel('Edit');
-      setBadgeColor('success');
-      setAttendanceStatus('Filled');
+      if(attendanceByDate.length === 0) {
+        setSubmitLabel('Submit');
+        setBadgeColor('success');
+        setAttendanceStatus('Filled');
+      } else {
+        setSubmitLabel('Edit');
+        setAttendanceStatus('Not filled');
+        setBadgeColor('warning');
+      }
     } else {
+      console.log("Current date");
       setEnableSubmit(true);
       setSubmitLabel('Submit');
       setBadgeColor('warning');

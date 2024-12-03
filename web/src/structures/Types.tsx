@@ -32,3 +32,20 @@ export const validationSchema = Yup.object({
     gender: Yup.string().required('Gender is required'),
   });
   
+export interface ListProps {
+    students: Student[];
+    filteredStudents: Student[];
+    loading: boolean;
+    handleOpen: (student: Student) => void;
+    handleDelete: (id: string) => void;
+    showConformation: boolean;
+    handleClose: () => void;
+    studentToDelete: Student | null;
+  }
+
+ export interface DeleteConfirmationModalProps {
+    show: boolean;
+    studentToDelete: Student | null;
+    handleClose: () => void;
+    handleDelete: (id: string) => void;
+  }
