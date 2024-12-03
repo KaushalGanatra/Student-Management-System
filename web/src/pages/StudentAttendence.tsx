@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Formik, Field, Form, FormikHelpers } from 'formik';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Student, Class, Division, AttendenceData } from '../structures/Types';
-import { Table, Button, Card, Row, Col, Badge } from 'react-bootstrap';
+import { Table, Button, Card, Row, Col, Badge, Spinner } from 'react-bootstrap';
 import '../stylesheets/App.css';
 import { fetchClasses, fetchDivisions, baseUrl } from '../utils/api';
 
@@ -20,6 +20,7 @@ const StudentAttendance = () => {
   const [attendanceStatus, setAttendanceStatus] = useState<string>('Pending');
   const [badgeColor, setBadgeColor] = useState<string>('primary');
   const [attendanceByDate, setAttendanceByDate] = useState<AttendenceData[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     fetchClasses().then(classResponse => {
@@ -34,15 +35,23 @@ const StudentAttendance = () => {
   }, []);
 
   const fetchAttendance = useCallback(async (date: string) => {
+    setLoading(true);
     const attendanceUrl = `${baseUrl}/attendance?attendenceDate=` + date;
-    const attendanceResponse: AxiosResponse<AttendenceData[]> = await axios.get(attendanceUrl);
-    setAttendanceByDate(attendanceResponse.data);
-    console.log("Attendance By Date: ", attendanceResponse.data);
+    try {
+      const attendanceResponse: AxiosResponse<AttendenceData[]> = await axios.get(attendanceUrl);
+      setAttendanceByDate(attendanceResponse.data);
+    } catch (err) {
+      console.error('Error fetching attendance:', err);
+      setAttendanceByDate([]);
+    }
+    setLoading(false);
   }, []);
 
   const addAttendence = useCallback(async (attendanceData: AttendenceData[]) => {
+    setLoading(true);
     const attendenceUrl = `${baseUrl}/attendance`;
     await axios.post(attendenceUrl, attendanceData);
+    setLoading(false);
   }, []);
 
   const fetchStudents = useCallback(async () => {
@@ -69,7 +78,6 @@ const StudentAttendance = () => {
     }
   }, [selectedClass, selectedDivision]);
 
-
   useEffect(() => {
     fetchStudents();
   }, [selectedClass, selectedDivision, fetchStudents]);
@@ -92,7 +100,6 @@ const StudentAttendance = () => {
       setBadgeColor('warning');
       setAttendanceStatus('Pending');
     }
-    console.log(enableSubmit);
   }, [selectedDate]);
 
   const handleSubmit = (values: AttendenceData, { setSubmitting }: FormikHelpers<AttendenceData>) => {
@@ -102,7 +109,6 @@ const StudentAttendance = () => {
       isPresent: values[`attendance-${student.id}`] || false,
     }));
 
-    console.log('Attendance data:', attendanceData);
     addAttendence(attendanceData);
     setSubmitting(false);
   };
@@ -216,39 +222,45 @@ const StudentAttendance = () => {
                     </Badge>
                   </h3>
 
-                  <Table striped bordered hover className="student-table">
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {students.length > 0 ? (
-                        students.map((student) => (
-                          <tr key={student.id} onClick={() => handleRowClick(student.id, setFieldValue)}>
-                            <td>{student.name}</td>
-                            <td>
-                              <Field
-                                type="checkbox"
-                                name={`attendance-${student.id}`}
-                                checked={values[`attendance-${student.id}`]}
-                                onChange={(e) =>
-                                  setFieldValue(`attendance-${student.id}`, e.target.checked)
-                                }
-                              />
+                  {loading ? (
+                    <div className="d-flex justify-content-center">
+                      <Spinner animation="border" variant="primary" />
+                    </div>
+                  ) : (
+                    <Table striped bordered hover className="student-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {students.length > 0 ? (
+                          students.map((student) => (
+                            <tr key={student.id} onClick={() => handleRowClick(student.id, setFieldValue)}>
+                              <td>{student.name}</td>
+                              <td>
+                                <Field
+                                  type="checkbox"
+                                  name={`attendance-${student.id}`}
+                                  checked={values[`attendance-${student.id}`]}
+                                  onChange={(e) =>
+                                    setFieldValue(`attendance-${student.id}`, e.target.checked)
+                                  }
+                                />
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={2} className="text-center">
+                              No students found
                             </td>
                           </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={2} className="text-center">
-                            No students found
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </Table>
+                        )}
+                      </tbody>
+                    </Table>
+                  )}
 
                   <Button className="float-right" type="submit" disabled={!enableSubmit}>
                     {submitLabel}
