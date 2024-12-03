@@ -23,9 +23,9 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> ListStudents(string? sClassId,string? sDivisionId)
         {
-            var students = await _studentRepository.ListAllStudents();
+            var students = await _studentRepository.ListAllStudents(sClassId, sDivisionId);
             if (students == null || !students.Any())
             {
                 return NotFound("No students found");
@@ -34,7 +34,7 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(StudentDTO studentDto)
+        public async Task<IActionResult> AddStudent(StudentDTO studentDto)
         {
             var createdStudent = await _studentRepository.AddStudent(studentDto);
             if (createdStudent == null)
@@ -43,6 +43,32 @@ namespace backend.Controllers
             }
             return Created(string.Empty, createdStudent);
         }
+
+        //For Modifications and refector
+
+        //[HttpPost]
+        //public async Task<IActionResult> AddStudent(StudentDTO studentDto)
+        //{
+        //    if (studentDto == null)
+        //    {
+        //        return BadRequest("Provide Student data");
+        //    }
+
+        //    if (string.IsNullOrEmpty(studentDto.Name) ||
+        //        !studentDto.Class.HasValue ||
+        //        string.IsNullOrEmpty(studentDto.Division) ||
+        //        string.IsNullOrEmpty(studentDto.Gender))
+        //    {
+        //        return BadRequest("Provide all of the student details");
+        //    }
+
+        //    var createdStudent = await _studentRepository.AddStudent(studentDto);
+        //    if (createdStudent == null)
+        //    {
+        //        return StatusCode(500);
+        //    }
+        //    return CreatedAtAction(nameof(GetStudentById), new { id = createdStudent.Id }, createdStudent);
+        //}
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetStudentById(string id)

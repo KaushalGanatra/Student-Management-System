@@ -22,12 +22,25 @@ namespace backend.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<IEnumerable<StudentDTO>> ListAllStudents()
+        public async Task<IEnumerable<StudentDTO>> ListAllStudents(string? sClassId, string? sDivisionId)
         {
-            var students = await _context.Students.Where(s => s.DeletedAt == null).ToListAsync();
+            var query = _context.Students.Where(s => s.DeletedAt == null);
+
+            if (!string.IsNullOrEmpty(sClassId) && Guid.TryParse(sClassId, out var classGuid))
+            {
+                query = query.Where(s => s.ClassId == classGuid);
+            }
+
+            if (!string.IsNullOrEmpty(sDivisionId) && Guid.TryParse(sDivisionId, out var divisionGuid))
+            {
+                query = query.Where(s => s.DivisionId == divisionGuid);
+            }
+
+            var students = await query.ToListAsync();
             var studentDtos = _mapper.Map<List<StudentDTO>>(students);
             return studentDtos;
         }
+
 
         public async Task<StudentDTO?> GetStudentById(Guid id)
         {
@@ -51,7 +64,7 @@ namespace backend.Repositories.Implementations
             }
 
             if (string.IsNullOrEmpty(studentDto.Name) ||
-                !studentDto.Class.HasValue ||
+                string.IsNullOrEmpty(studentDto.Class) ||
                 string.IsNullOrEmpty(studentDto.Division) ||
                 string.IsNullOrEmpty(studentDto.Gender))
             {
@@ -69,6 +82,21 @@ namespace backend.Repositories.Implementations
             return createdStudentDto;
         }
 
+        //For Modifications and refector
+
+        //public async Task<StudentDTO?> AddStudent(StudentDTO studentDto)
+        //{
+        //    var student = _mapper.Map<Student>(studentDto);
+        //    student.UpdatedAt = DateTime.UtcNow;
+
+        //    _context.Students.Add(student);
+        //    await _context.SaveChangesAsync();
+
+        //    var createdStudentDto = _mapper.Map<StudentDTO>(student);
+
+        //    return createdStudentDto;
+        //}
+
         public async Task<StudentDTO?> UpdateStudent(Guid id, StudentDTO studentDto)
         {
             var existingStudent = await _context.Students.Where(s => s.DeletedAt == null && s.Id == id).FirstOrDefaultAsync();
@@ -80,7 +108,7 @@ namespace backend.Repositories.Implementations
 
             //empty object
             if (string.IsNullOrEmpty(studentDto.Name) &&
-                !studentDto.Class.HasValue &&
+                string.IsNullOrEmpty(studentDto.Class) &&
                 string.IsNullOrEmpty(studentDto.Division) &&
                 string.IsNullOrEmpty(studentDto.Gender))
             {

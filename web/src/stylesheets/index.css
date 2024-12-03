@@ -24,6 +24,7 @@ a:hover {
 
 body {
   margin: 0;
+  height: 100%;
   display: flex;
   place-items: center;
   min-width: 320px;
@@ -65,4 +66,26 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+html {
+  margin: 0;
+  height: 100%;
+}
+
+.table-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.student-table {
+  flex: 1;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
