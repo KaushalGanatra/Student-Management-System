@@ -83,7 +83,8 @@ const StudentAttendance = () => {
   }, [selectedClass, selectedDivision, fetchStudents]);
 
   useEffect(() => {
-    setAttendanceByDate([]);
+    setAttendanceByDate([]); 
+  
     if (selectedDate > todayDate) {
       console.log("Future date");
       setEnableSubmit(false);
@@ -91,19 +92,9 @@ const StudentAttendance = () => {
       setBadgeColor('info');
       setAttendanceStatus('Cannot fill in advance');
     } else if (selectedDate < todayDate) {
-      console.log("Old date");
-      fetchAttendance(selectedDate);
-      console.log("Length: "+attendanceByDate.length);
-      setEnableSubmit(true);
-      if(attendanceByDate.length === 0) {
-        setSubmitLabel('Submit');
-        setBadgeColor('success');
-        setAttendanceStatus('Filled');
-      } else {
-        setSubmitLabel('Edit');
-        setAttendanceStatus('Not filled');
-        setBadgeColor('warning');
-      }
+      console.log("Past date");
+      fetchAttendance(selectedDate); 
+      setEnableSubmit(true);  
     } else {
       console.log("Current date");
       setEnableSubmit(true);
@@ -112,6 +103,20 @@ const StudentAttendance = () => {
       setAttendanceStatus('Pending');
     }
   }, [selectedDate]);
+
+  useEffect(() => {
+    if (selectedDate < todayDate) {  
+      if (attendanceByDate.length === 0) {
+        setSubmitLabel('Submit');
+        setAttendanceStatus('Not filled');
+        setBadgeColor('warning');
+      } else {
+        setSubmitLabel('Edit');
+        setAttendanceStatus('Filled');
+        setBadgeColor('success');
+      }
+    }
+  }, [attendanceByDate, selectedDate]);
 
   const handleSubmit = (values: AttendenceData, { setSubmitting }: FormikHelpers<AttendenceData>) => {
     const attendanceData = students.map((student) => ({
