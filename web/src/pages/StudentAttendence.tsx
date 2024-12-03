@@ -8,51 +8,23 @@ import '../stylesheets/App.css';
 import { fetchClasses, fetchDivisions, baseUrl } from '../utils/api';
 
 const StudentAttendance = () => {
+  const [attendanceByDate, setAttendanceByDate] = useState<AttendenceData[]>([]);
+
   const [students, setStudents] = useState<Student[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [selectedClass, setSelectedClass] = useState<string>('');
-  const [selectedDivision, setSelectedDivision] = useState<string>('');
   const [classes, setClasses] = useState<Class[]>([]);
+  const [selectedClass, setSelectedClass] = useState<string>('');
   const [divisions, setDivisions] = useState<Division[]>([]);
+  const [selectedDivision, setSelectedDivision] = useState<string>('');
   const [todayDate, setTodayDate] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<string>('');
+
   const [enableSubmit, setEnableSubmit] = useState<boolean>(true);
   const [submitLabel, setSubmitLabel] = useState<string>('Submit');
-  const [attendanceStatus, setAttendanceStatus] = useState<string>('Pending');
+  
   const [badgeColor, setBadgeColor] = useState<string>('primary');
-  const [attendanceByDate, setAttendanceByDate] = useState<AttendenceData[]>([]);
+  const [attendanceStatus, setAttendanceStatus] = useState<string>('');
+
   const [loading, setLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    fetchClasses().then(classResponse => {
-      setClasses(classResponse);
-    });
-    fetchDivisions().then(divisionResponse => {
-      setDivisions(divisionResponse);
-    });
-    setSelectedDate(new Date().toISOString().split('T')[0]);
-    setTodayDate(new Date().toISOString().split('T')[0]);
-    fetchStudents();
-  }, []);
-
-  const fetchAttendance = useCallback(async (date: string) => {
-    setLoading(true);
-    const attendanceUrl = `${baseUrl}/attendance?attendenceDate=` + date;
-    try {
-      const attendanceResponse: AxiosResponse<AttendenceData[]> = await axios.get(attendanceUrl);
-      setAttendanceByDate(attendanceResponse.data);
-    } catch (err) {
-      console.error('Error fetching attendance:', err);
-      setAttendanceByDate([]);
-    }
-    setLoading(false);
-  }, []);
-
-  const addAttendence = useCallback(async (attendanceData: AttendenceData[]) => {
-    setLoading(true);
-    const attendenceUrl = `${baseUrl}/attendance`;
-    await axios.post(attendenceUrl, attendanceData);
-    setLoading(false);
-  }, []);
 
   const fetchStudents = useCallback(async () => {
     try {
@@ -79,6 +51,37 @@ const StudentAttendance = () => {
   }, [selectedClass, selectedDivision]);
 
   useEffect(() => {
+    fetchClasses().then(classResponse => {
+      setClasses(classResponse);
+    });
+    fetchDivisions().then(divisionResponse => {
+      setDivisions(divisionResponse);
+    });
+    setSelectedDate(new Date().toISOString().split('T')[0]);
+    setTodayDate(new Date().toISOString().split('T')[0]);
+    fetchStudents();
+  }, []);
+
+  const fetchAttendance = useCallback(async (date: string) => {
+    setLoading(true);
+    const attendanceUrl = `${baseUrl}/attendance?attendenceDate=` + date;
+    try {
+      const attendanceResponse: AxiosResponse<AttendenceData[]> = await axios.get(attendanceUrl);
+      setAttendanceByDate(attendanceResponse.data);
+    } catch (err) {
+      setAttendanceByDate([]);
+    }
+    setLoading(false);
+  }, []);
+
+  const addAttendence = useCallback(async (attendanceData: AttendenceData[]) => {
+    setLoading(true);
+    const attendenceUrl = `${baseUrl}/attendance`;
+    await axios.post(attendenceUrl, attendanceData);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
     fetchStudents();
   }, [selectedClass, selectedDivision, fetchStudents]);
 
@@ -97,10 +100,8 @@ const StudentAttendance = () => {
       setEnableSubmit(true);  
     } else {
       console.log("Current date");
+      fetchAttendance(selectedDate); 
       setEnableSubmit(true);
-      setSubmitLabel('Submit');
-      setBadgeColor('warning');
-      setAttendanceStatus('Pending');
     }
   }, [selectedDate]);
 
@@ -115,6 +116,16 @@ const StudentAttendance = () => {
         setAttendanceStatus('Filled');
         setBadgeColor('success');
       }
+    } else if (selectedDate == todayDate) {
+      if(attendanceByDate.length !== 0) {
+        setSubmitLabel('Edit');
+        setAttendanceStatus('Filled');
+        setBadgeColor('success');
+      } else {
+        setSubmitLabel('Submit');
+        setAttendanceStatus('Pending');
+        setBadgeColor('warning');
+      }
     }
   }, [attendanceByDate, selectedDate]);
 
@@ -128,6 +139,7 @@ const StudentAttendance = () => {
     addAttendence(attendanceData);
     setSubmitting(false);
   };
+  
 
   const handleClassChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
