@@ -5,6 +5,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Student, Class, Division, AttendenceData } from '../structures/Types';
 import { Table, Button, Card, Row, Col, Badge } from 'react-bootstrap';
 import '../stylesheets/App.css';
+import { fetchClasses, fetchDivisions, baseUrl } from '../utils/api';
 
 const StudentAttendance = () => {
   const [students, setStudents] = useState<Student[]>([]);
@@ -13,7 +14,6 @@ const StudentAttendance = () => {
   const [selectedDivision, setSelectedDivision] = useState<string>('');
   const [classes, setClasses] = useState<Class[]>([]);
   const [divisions, setDivisions] = useState<Division[]>([]);
-  const baseUrl = 'http://localhost:5027/api';
   const [todayDate, setTodayDate] = useState<string>('');
   const [enableSubmit, setEnableSubmit] = useState<boolean>(true);
   const [submitLabel, setSubmitLabel] = useState<string>('Submit');
@@ -21,16 +21,16 @@ const StudentAttendance = () => {
   const [badgeColor, setBadgeColor] = useState<string>('primary');
   const [attendanceByDate, setAttendanceByDate] = useState<AttendenceData[]>([]);
 
-  const fetchClasses = useCallback(async () => {
-    const classUrl = `${baseUrl}/class`;
-    const classResponse: AxiosResponse<Class[]> = await axios.get(classUrl);
-    setClasses(classResponse.data);
-  }, []);
-
-  const fetchDivisions = useCallback(async () => {
-    const divisionUrl = `${baseUrl}/division`;
-    const divisionResponse: AxiosResponse<Division[]> = await axios.get(divisionUrl);
-    setDivisions(divisionResponse.data);
+  useEffect(() => {
+    fetchClasses().then(classResponse => {
+      setClasses(classResponse);
+    });
+    fetchDivisions().then(divisionResponse => {
+      setDivisions(divisionResponse);
+    });
+    setSelectedDate(new Date().toISOString().split('T')[0]);
+    setTodayDate(new Date().toISOString().split('T')[0]);
+    fetchStudents();
   }, []);
 
   const fetchAttendance = useCallback(async (date: string) => {
@@ -69,13 +69,6 @@ const StudentAttendance = () => {
     }
   }, [selectedClass, selectedDivision]);
 
-  useEffect(() => {
-    fetchClasses();
-    fetchDivisions();
-    setSelectedDate(new Date().toISOString().split('T')[0]);
-    setTodayDate(new Date().toISOString().split('T')[0]);
-    fetchStudents();
-  }, []);
 
   useEffect(() => {
     fetchStudents();

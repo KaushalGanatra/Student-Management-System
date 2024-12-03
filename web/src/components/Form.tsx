@@ -1,23 +1,26 @@
 import '../stylesheets/App.css';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { Button, Form as BootstrapForm, Row, Col, Alert, Spinner, Container, Card } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios, {AxiosResponse} from 'axios';
+import axios from 'axios';
 import { Student, validationSchema, Class, Division } from '../structures/Types';  
+import { fetchClasses, fetchDivisions } from '../utils/api';
 
 const StudentForm = () => {
-  const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
+  const { id } = useParams<{ id?: string }>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
+  const [classes, setClasses] = useState<Class[]>([]);
+  const [divisions, setDivisions] = useState<Division[]>([]);
   const [student, setStudent] = useState<Student>({
     name: '',
     class: '',
     division: '',
     gender: '',
   });
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
-  const [success, setSuccess] = useState<string>('');
 
   useEffect(() => {
     fetchClasses();
@@ -27,20 +30,14 @@ const StudentForm = () => {
     }
   }, [id]);
 
-  const baseUrl = 'http://localhost:5027/api';
-  const [classes, setClasses] = useState<Class[]>([]);
-  const [divisions, setDivisions] = useState<Division[]>([]);
+  useEffect(() => {
+    fetchClasses().then(classResponse => {
+      setClasses(classResponse);
+    });
 
-  const fetchClasses = useCallback(async () => {
-    const classUrl = `${baseUrl}/class`;
-    const classResponse: AxiosResponse<Class[]> = await axios.get(classUrl);
-    setClasses(classResponse.data);
-  }, []);
-
-  const fetchDivisions = useCallback(async () => {
-    const divisionUrl = `${baseUrl}/division`;
-    const divisionResponse: AxiosResponse<Division[]> = await axios.get(divisionUrl);
-    setDivisions(divisionResponse.data);
+    fetchDivisions().then(divisionResponse => {
+      setDivisions(divisionResponse)
+    });
   }, []);
 
   const fetchStudentData = async (studentId: string) => {
