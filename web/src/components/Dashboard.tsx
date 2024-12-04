@@ -20,7 +20,11 @@ const Dashboard = () => {
     };
   
     students.forEach(student => {
+<<<<<<< Updated upstream
       const classDivisionKey = `${student.class}${student.division}`;
+=======
+      const classDivisionKey = `${student.class}-${student.division}`;
+>>>>>>> Stashed changes
   
       classDivisionCounts[classDivisionKey] = (classDivisionCounts[classDivisionKey] || 0) + 1;
   
@@ -46,6 +50,7 @@ const Dashboard = () => {
             </Card>
 
             <Card className="mb-4">
+<<<<<<< Updated upstream
               <Card.Header>Students Count Per Class</Card.Header>
               <ListGroup variant="flush">
               {Object.entries(classDivisionCounts).map(([classDivision, count]) => (
@@ -58,6 +63,26 @@ const Dashboard = () => {
                 <small className="text-muted">Total Students: {students.length}</small>
               </Card.Footer>
             </Card>
+=======
+            <Card.Header>Students Count Per Class</Card.Header>
+            <ListGroup variant="flush">
+              {Object.entries(classDivisionCounts).map(([classDivision, count]) => (
+                <ListGroup.Item key={classDivision} className="d-flex justify-content-between align-items-center">
+                  <strong>{classDivision} :</strong> {count} student(s)
+                  <a 
+                    href={`/list?class=${classDivision.split('-')[0]}&division=${classDivision.split('-')[1]}`} 
+                    className='ms-auto'
+                  >
+                    View Students
+                  </a>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+            <Card.Footer>
+              <small className="text-muted">Total Students: {students.length}</small>
+            </Card.Footer>
+          </Card>
+>>>>>>> Stashed changes
 
             <Card className="mb-4">
             <Card.Header>Gender Count</Card.Header>

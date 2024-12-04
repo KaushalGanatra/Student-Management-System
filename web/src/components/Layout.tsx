@@ -10,8 +10,13 @@ const Layout = ({ children }) => {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link href="/list">Student List</Nav.Link>
+<<<<<<< Updated upstream
               <Nav.Link href="/form">Student Form</Nav.Link>
               <Nav.Link href="/attendence">Student Attendance</Nav.Link>
+=======
+              <Nav.Link href="/form">Add Student</Nav.Link>
+              <Nav.Link href="/attendence">Fill Attendance</Nav.Link>
+>>>>>>> Stashed changes
             </Nav>
             <Form className="d-flex">
               <FormControl
