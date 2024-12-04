@@ -1,6 +1,38 @@
 import { Container, Row, Col, Card, ListGroup, Button } from 'react-bootstrap';
+import { fetchStudents } from '../utils/api';
+import { useEffect, useState } from 'react';
+import { Student } from '../structures/Types';
 
 const Dashboard = () => {
+  const [students, setStudents] = useState<Student[]>([]);
+
+  useEffect(() => {
+    fetchStudents().then((studentResponse: Student[]) => {
+      setStudents(studentResponse);
+    });
+  }, []);
+
+    const classDivisionCounts: { [key: string]: number } = {};
+    const genderCounts = {
+      Male: 0,
+      Female: 0,
+      Other: 0
+    };
+  
+    students.forEach(student => {
+      const classDivisionKey = `${student.class}${student.division}`;
+  
+      classDivisionCounts[classDivisionKey] = (classDivisionCounts[classDivisionKey] || 0) + 1;
+  
+      if (student.gender === 'Male') {
+        genderCounts.Male += 1;
+      } else if (student.gender === 'Female') {
+        genderCounts.Female += 1;
+      } else {
+        genderCounts.Other += 1;
+      }
+    });
+
   return (
     <>
       <Container className="mt-4">
@@ -8,46 +40,40 @@ const Dashboard = () => {
           <Col>
             <Card className="mb-4">
               <Card.Body>
-                <Card.Title>Bootstrap</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">Since 2011</Card.Subtitle>
+                <Card.Title>Dashboard</Card.Title>
+                <Card.Subtitle className="mb-2 text-muted">Student Analysis</Card.Subtitle>
               </Card.Body>
             </Card>
 
             <Card className="mb-4">
-              <Card.Header>Class List</Card.Header>
+              <Card.Header>Students Count Per Class</Card.Header>
               <ListGroup variant="flush">
-                <ListGroup.Item>
-                  <strong>@username</strong> Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.
+              {Object.entries(classDivisionCounts).map(([classDivision, count]) => (
+                <ListGroup.Item key={classDivision}>
+                  <strong>{classDivision} :</strong> {count} student(s)
                 </ListGroup.Item>
-                <ListGroup.Item>
-                  <strong>@username</strong> Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <strong>@username</strong> Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.
-                </ListGroup.Item>
+                ))}
               </ListGroup>
               <Card.Footer>
-                <small className="text-muted">All updates</small>
+                <small className="text-muted">Total Students: {students.length}</small>
               </Card.Footer>
             </Card>
 
-            <Card>
-              <Card.Header>Suggestions</Card.Header>
-              <ListGroup variant="flush">
-                <ListGroup.Item>
-                  <strong>Full Name</strong> @username <Button variant="link">Follow</Button>
+            <Card className="mb-4">
+            <Card.Header>Gender Count</Card.Header>
+            <ListGroup variant="flush">
+              {Object.entries(genderCounts).map(([genderType, count]) => (
+                <ListGroup.Item key={genderType}>
+                  <strong>{genderType} :</strong> {count}
                 </ListGroup.Item>
-                <ListGroup.Item>
-                  <strong>Full Name</strong> @username <Button variant="link">Follow</Button>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <strong>Full Name</strong> @username <Button variant="link">Follow</Button>
-                </ListGroup.Item>
-              </ListGroup>
-              <Card.Footer>
-                <small className="text-muted">All suggestions</small>
-              </Card.Footer>
-            </Card>
+              ))}
+            </ListGroup>
+            <Card.Footer>
+              <small className="text-muted">
+                Genders: {Object.keys(genderCounts).join(", ")}
+              </small>
+            </Card.Footer>
+          </Card>
           </Col>
         </Row>
       </Container>

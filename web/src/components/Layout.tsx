@@ -5,13 +5,13 @@ const Layout = ({ children }) => {
     <>
       <Navbar bg="dark" variant="dark" expand="lg">
         <Container>
-          <Navbar.Brand href="/">Student Management System</Navbar.Brand>
+          <Navbar.Brand href="/">Student Managemement System</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link href="/list">Student List</Nav.Link>
-              <Nav.Link href="/form">Add Students</Nav.Link>
-              <Nav.Link href="/attendence">Fill Attendance</Nav.Link>
+              <Nav.Link href="/form">Student Form</Nav.Link>
+              <Nav.Link href="/attendence">Student Attendance</Nav.Link>
             </Nav>
             <Form className="d-flex">
               <FormControl
@@ -26,7 +26,7 @@ const Layout = ({ children }) => {
         </Container>
       </Navbar>
 
-      <Container className="mt-4">
+      <Container fluid className="mt-4" style={{ height: 'calc(100vh - 56px)' }}>
         {children}
       </Container>
     </>

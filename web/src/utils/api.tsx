@@ -1,4 +1,4 @@
-import {Class, Division } from '../structures/Types';
+import {Class, Division, Student } from '../structures/Types';
 import axios, {AxiosResponse} from 'axios';
 export const baseUrl = 'http://localhost:5027/api';
 
@@ -12,4 +12,10 @@ export const baseUrl = 'http://localhost:5027/api';
     const divisionUrl = `${baseUrl}/division`;
     const divisionResponse: AxiosResponse<Division[]> = await axios.get(divisionUrl);
     return divisionResponse.data;
+  };
+
+  export const fetchStudents = async () => {
+    const studentUrl = `${baseUrl}/student`;
+    const studentResponse: AxiosResponse<Student[]> = await axios.get(studentUrl);
+    return studentResponse.data;
   };
