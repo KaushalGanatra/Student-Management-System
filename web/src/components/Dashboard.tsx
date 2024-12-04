@@ -1,4 +1,4 @@
-import { Container, Row, Col, Card, ListGroup, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, ListGroup } from 'react-bootstrap';
 import { fetchStudents } from '../utils/api';
 import { useEffect, useState } from 'react';
 import { Student } from '../structures/Types';
@@ -20,11 +20,7 @@ const Dashboard = () => {
     };
   
     students.forEach(student => {
-<<<<<<< Updated upstream
-      const classDivisionKey = `${student.class}${student.division}`;
-=======
       const classDivisionKey = `${student.class}-${student.division}`;
->>>>>>> Stashed changes
   
       classDivisionCounts[classDivisionKey] = (classDivisionCounts[classDivisionKey] || 0) + 1;
   
@@ -50,20 +46,6 @@ const Dashboard = () => {
             </Card>
 
             <Card className="mb-4">
-<<<<<<< Updated upstream
-              <Card.Header>Students Count Per Class</Card.Header>
-              <ListGroup variant="flush">
-              {Object.entries(classDivisionCounts).map(([classDivision, count]) => (
-                <ListGroup.Item key={classDivision}>
-                  <strong>{classDivision} :</strong> {count} student(s)
-                </ListGroup.Item>
-                ))}
-              </ListGroup>
-              <Card.Footer>
-                <small className="text-muted">Total Students: {students.length}</small>
-              </Card.Footer>
-            </Card>
-=======
             <Card.Header>Students Count Per Class</Card.Header>
             <ListGroup variant="flush">
               {Object.entries(classDivisionCounts).map(([classDivision, count]) => (
@@ -82,7 +64,6 @@ const Dashboard = () => {
               <small className="text-muted">Total Students: {students.length}</small>
             </Card.Footer>
           </Card>
->>>>>>> Stashed changes
 
             <Card className="mb-4">
             <Card.Header>Gender Count</Card.Header>
