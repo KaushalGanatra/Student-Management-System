@@ -230,7 +230,7 @@ const StudentForm = () => {
                 </Button>
 
                 <div className="mt-3">
-                  <Button variant="secondary" onClick={() => navigate('/')} className="w-100">
+                  <Button variant="secondary" onClick={() => navigate('/list')} className="w-100">
                     Cancel
                   </Button>
                 </div>

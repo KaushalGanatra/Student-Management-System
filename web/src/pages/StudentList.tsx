@@ -54,27 +54,6 @@ const StudentList = () => {
   return (
     <div className="student-list-container">
       <div className="header-search-container p-0">
-        <Card className="header-card mb-0">
-          <Card.Header className="bg-primary text-white">
-            <Row className="d-flex align-items-center">
-              <Col>
-                <h2 className="mb-0">Student List</h2>
-              </Col>
-              <Col className="d-flex justify-content-end">
-                <Link to={`/attendence`} className="me-2">
-                  <Button variant="light" className="d-flex align-items-center">
-                    <span className="me-0"></span> Fill Attendence
-                  </Button>
-                </Link>
-                <Link to={`/form`}>
-                  <Button variant="light" className="d-flex align-items-center">
-                    <span className="me-0">+</span> Add Student
-                  </Button>
-                </Link>
-              </Col>
-            </Row>
-          </Card.Header>
-        </Card>
         <Search students={students} setFilteredStudents={setFilteredStudents} />
       </div>
 

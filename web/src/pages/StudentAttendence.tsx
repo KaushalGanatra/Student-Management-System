@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { Formik, Field, Form, FormikHelpers } from 'formik';
 import axios, { AxiosResponse, AxiosError } from 'axios';
@@ -134,14 +133,6 @@ const StudentAttendance = () => {
     <div className="student-list-container">
       <div className="header-search-container p-0">
         <Card className="header-card mb-0">
-          <Card.Header className="bg-primary text-white d-flex align-items-center">
-            <h2 className="mb-0">Student Attendance</h2>
-            <Link to={"/"} className="ms-auto">
-              <Button variant="light" className="d-flex align-items-center">
-                <span><i className="bi bi-arrow-left"></i>Back</span>
-              </Button>
-            </Link>
-          </Card.Header>
           <Card.Body>
             <Formik
               enableReinitialize={true}
