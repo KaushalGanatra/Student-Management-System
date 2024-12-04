@@ -165,7 +165,7 @@ const StudentAttendance = () => {
                         as="select"
                         name="class"
                         className="form-control"
-                        onChange={e => {
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                           setSelectedClass(e.target.value);
                           setFieldValue('class', e.target.value);
                         }}
@@ -184,7 +184,7 @@ const StudentAttendance = () => {
                         as="select"
                         name="division"
                         className="form-control"
-                        onChange={e => {
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                           setSelectedDivision(e.target.value);
                           setFieldValue('division', e.target.value);
                         }}
@@ -204,7 +204,7 @@ const StudentAttendance = () => {
                         name="date"
                         className="form-control"
                         value={selectedDate}
-                        onChange={e => {
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                           setSelectedDate(e.target.value);
                           setFieldValue('date', e.target.value);
                         }}
@@ -229,7 +229,7 @@ const StudentAttendance = () => {
                                 type="checkbox"
                                 name={`attendance-${student.id}`}
                                 checked={values[`attendance-${student.id}`]}
-                                onChange={e => setFieldValue(`attendance-${student.id}`, e.target.checked)}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFieldValue(`attendance-${student.id}`, e.target.checked)}
                               />
                             </td>
                           </tr>
@@ -271,7 +271,7 @@ const StudentAttendance = () => {
         handleClose={handleCloseConfirmation}
         handleDelete={handleConfirmSubmission}
         handleSubmission={handleConfirmSubmission}
-        message="Are you sure you want to mark attendance for this student?"
+        message="Are you sure you want to mark attendance for this date?"
         actionLabel="Confirm Attendance"
       />
     </div>

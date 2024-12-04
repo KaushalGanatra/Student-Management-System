@@ -10,7 +10,7 @@ export type Student = {
 
 export type Class = {
     id: string;
-    classNumber: number;
+    classNumber: string;
 }
 
 export type Division = {
@@ -20,9 +20,10 @@ export type Division = {
 
 export type AttendenceData = {
     id: string;
-    attendenceDate: Date;
+    attendenceDate: string;
     studentId: string;
     isPresent: boolean;
+    [key: string]: boolean | string;
 }
 
 export const validationSchema = Yup.object({

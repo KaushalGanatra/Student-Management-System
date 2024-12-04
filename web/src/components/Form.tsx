@@ -131,7 +131,7 @@ const StudentForm = () => {
                         id="class"
                         className={`form-control ${touched.class && errors.class ? 'is-invalid' : ''}`}
                         value={values.class}  
-                        onChange={e => {
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                           const selectedClassId = e.target.value;
                           setFieldValue('class', selectedClassId);  
                         }}
@@ -156,7 +156,7 @@ const StudentForm = () => {
                         id="division"
                         className={`form-control ${touched.division && errors.division ? 'is-invalid' : ''}`}
                         value={values.division} 
-                        onChange={e => {
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                           const selectedDivisionId = e.target.value;
                           setFieldValue('division', selectedDivisionId); 
                         }}
